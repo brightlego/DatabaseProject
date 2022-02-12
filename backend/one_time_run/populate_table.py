@@ -2,20 +2,22 @@ import sqlite3
 import csv
 from datetime import date, timedelta
 import random
+import os
 
-DB_NAME = "sunnytots.db"
+DB_NAME = os.path.join("..","sunnytots.db")
 
-CAREGIVER_CSV = "mock_data/caregivers.csv"
-CHILDNAMES_CSV = "mock_data/childnames.csv"
+CAREGIVER_CSV = os.path.join("mock_data","caregivers.csv")
+CHILDNAMES_CSV = os.path.join("mock_data","childnames.csv")
 
 CAREGIVER_INSERT_SQL = """
 INSERT INTO Caregivers(
     CaregiverID,
     PhysicalAddress,
     ContactNumber,
-    EmailAddress
+    EmailAddress,
+    Name
 )
-VALUES (?,?,?,?)
+VALUES (?,?,?,?,?)
 """
 
 CHILD_INSERT_SQL = """
@@ -29,33 +31,33 @@ VALUES (?,?,?)
 
 SESSION_MORNING_INSERT_SQL = """
 INSERT INTO Sessions(
-    SessionID,
     SessionType,
     Date
 )
-VALUES (?,'M',?)
+VALUES ('M',?)
 """
 
 SESSION_AFTERNOON_INSERT_SQL = """
 INSERT INTO Sessions(
-    SessionID,
     SessionType,
     Date
 )
-VALUES (?,'A', ?)
+VALUES ('A', ?)
 """
 
 CHILD_SESSION_INSERT_SQL = """
 INSERT INTO ChildSessions(
     ChildID,
+    Date,
     MorningSession,
     AfternoonSession,
-    BookingType
+    MorningBooked,
+    AfternoonBooked
 )
-VALUES (?,?,?,?)
+VALUES (?,?,?,?,?,?)
 """
 
-GET_20_CHILDREN_SQL = "SELECT ChildID FROM Children ORDER BY RANDOM() LIMIT 20"
+GET_N_CHILDREN_SQL = "SELECT ChildID FROM Children ORDER BY RANDOM() LIMIT ?"
 
 GET_MORNING_SESSION = "SELECT SessionID FROM Sessions WHERE Date=? AND SessionType='M'"
 GET_AFTERNOON_SESSION = (
@@ -106,11 +108,9 @@ def populate_sessions(connection):
     errors = {}
     for day in days_in_year(YEAR, restrictions=True):
         daystr = day.isoformat()
-        morningid = random.randint(1, 1000000)
-        afternoonid = random.randint(1, 1000000)
         try:
-            connection.execute(SESSION_MORNING_INSERT_SQL, [morningid, daystr])
-            connection.execute(SESSION_AFTERNOON_INSERT_SQL, [afternoonid, daystr])
+            connection.execute(SESSION_MORNING_INSERT_SQL, [daystr])
+            connection.execute(SESSION_AFTERNOON_INSERT_SQL, [daystr])
         except sqlite3.IntegrityError as err:
             errstr = f"{type(err).__name__}: {str(err)}"
             if errstr in errors:
@@ -126,23 +126,13 @@ def populate_sessions(connection):
 
 
 def link_child_session(connection):
+    print('')
     errors = {}
     for day in days_in_year(YEAR, restrictions=True):
-        morning_children = connection.execute(GET_20_CHILDREN_SQL).fetchall()
-        afternoon_children = connection.execute(GET_20_CHILDREN_SQL).fetchall()
+        morning_children = connection.execute(GET_N_CHILDREN_SQL,[random.randint(1,20)]).fetchall()
+        afternoon_children = connection.execute(GET_N_CHILDREN_SQL,[random.randint(1,20)]).fetchall()
 
-        morning_session = connection.execute(
-            GET_MORNING_SESSION, [day.isoformat()]
-        ).fetchone()
-        afternoon_session = connection.execute(
-            GET_AFTERNOON_SESSION, [day.isoformat()]
-        ).fetchone()
-
-        if morning_session is None or afternoon_session is None:
-            continue
-        else:
-            morning_session = morning_session[0]
-            afternoon_session = afternoon_session[0]
+        datestr = day.isoformat()
 
         try:
             for (child,) in morning_children:
@@ -151,15 +141,24 @@ def link_child_session(connection):
                         CHILD_SESSION_INSERT_SQL,
                         [
                             child,
-                            morning_session,
-                            afternoon_session,
-                            random.choice("NMAB"),
+                            datestr,
+                            True,
+                            True,
+                            random.choice([True, False]),
+                            random.choice([True, False])
                         ],
                     )
                 else:
                     connection.execute(
                         CHILD_SESSION_INSERT_SQL,
-                        [child, morning_session, 0, random.choice("NM")],
+                        [
+                            child,
+                            datestr,
+                            True,
+                            False,
+                            random.choice([True, False]),
+                            False
+                        ],
                     )
 
             for (child,) in afternoon_children:
@@ -168,7 +167,14 @@ def link_child_session(connection):
                 else:
                     connection.execute(
                         CHILD_SESSION_INSERT_SQL,
-                        [child, 0, afternoon_session, random.choice("NA")],
+                        [
+                            child,
+                            datestr,
+                            False,
+                            True,
+                            False,
+                            random.choice([True, False])
+                        ],
                     )
         except sqlite3.IntegrityError as err:
             errstr = f"{type(err).__name__}: {str(err)}"

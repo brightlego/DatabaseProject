@@ -1,6 +1,7 @@
 import sqlite3
+import os
 
-DB_NAME = "sunnytots.db"
+DB_NAME = os.path.join("..","sunnytots.db")
 SQL_STATEMENTS = "SQLstatements.sql"
 
 connection = sqlite3.connect(DB_NAME)
