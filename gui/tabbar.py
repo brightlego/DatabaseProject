@@ -1,8 +1,8 @@
-import gui.page
+import gui.templates
 import tkinter as tk
 
 
-class TabBar(gui.page.Page):
+class TabBar(gui.templates.Page):
     def _init_elements(self):
         self.__add_button = tk.Button(
             self, text="Add", command=lambda: self._parent.change_tab("add")

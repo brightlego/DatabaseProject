@@ -1,12 +1,12 @@
 import tkinter as tk
 
-import gui.page
+import gui.templates
 import gui.tabs
 import gui.input
 import gui.tabbar
 
 
-class Gui(gui.page.Page):
+class Gui(gui.templates.Page):
     def __init__(self, backend):
         self.__backend = backend
         self.__root = tk.Tk()

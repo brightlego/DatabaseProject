@@ -1,6 +1,6 @@
 import math
 import tkinter as tk
-import gui.page
+import gui.templates
 
 
 def _centre(text, width, filler=" "):
@@ -9,7 +9,7 @@ def _centre(text, width, filler=" "):
     return text
 
 
-class Tabs(gui.page.Page):
+class Tabs(gui.templates.Page):
     def _init_elements(self):
         self.__add_tab = gui.tabs.AddTab(self)
         self.__get_tab = gui.tabs.GetTab(self)
@@ -65,7 +65,7 @@ class _TabButton(tk.Button):
         )
 
 
-class __Tab(gui.page.Page):
+class __Tab(gui.templates.Page):
     _BUTTON_NAMES = []
     _NAME = "Tab"
     _TAB_WIDTH_CHAR = 80

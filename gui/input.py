@@ -1,6 +1,6 @@
 import tkinter as tk
-import gui.page as page
+import gui.templates
 
 
-class InputField(page.Page):
+class InputField(gui.templates.Page):
     pass
