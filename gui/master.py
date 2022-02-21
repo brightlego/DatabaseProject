@@ -1,8 +1,10 @@
+import tkinter as tk
+
 import gui.page
 import gui.tabs
 import gui.input
 import gui.tabbar
-import tkinter as tk
+
 
 class Gui(gui.page.Page):
     def __init__(self, backend):
@@ -19,7 +21,9 @@ class Gui(gui.page.Page):
         self.__rem_tab = gui.tabs.RemoveTab(self.__tab_frame)
         self.__chg_tab = gui.tabs.ChangeTab(self.__tab_frame)
 
-        self.__tab_bar.grid(column=0, row=0)
+        self.__input = gui.input.InputField(self)
+
+        self.__tabbar.grid(column=0, row=0)
         self.__tab_frame.grid(column=0, row=1)
 
         self.__add_tab.grid(column=0, row=0)
@@ -28,14 +32,14 @@ class Gui(gui.page.Page):
         self.__chg_tab.grid(column=0, row=0)
 
     def change_tab(self, tab):
-        if tab == 'add':
+        if tab == "add":
             self.__add_tab.show()
-        elif tab == 'get':
+        elif tab == "get":
             self.__get_tab.show()
-        elif tab == 'rem':
+        elif tab == "rem":
             self.__rem_tab.show()
-        elif tab == 'chg':
+        elif tab == "chg":
             self.__chg_tab.show()
 
-    def mainloop(self):
-        self.__root.mainloop()
+    def mainloop(self, *args, **kwargs):
+        self.__root.mainloop(*args, **kwargs)
