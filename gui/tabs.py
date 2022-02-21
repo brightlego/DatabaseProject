@@ -53,14 +53,14 @@ class Tabs(gui.templates.Page):
 
 
 class _TabButton(tk.Button):
-    def __init__(self, parent, text, *args, **kwargs):
+    def __init__(self, parent, text, command, *args, **kwargs):
         self.__text = text
         self.__parent = parent
         super().__init__(
             parent,
             *args,
             text=self.__text,
-            command=lambda: self.__parent.change_input(text),
+            command=lambda: self.__parent.change_input(command),
             **kwargs,
         )
 
@@ -109,9 +109,11 @@ class __Tab(gui.templates.HideablePage):
             columnspan, rowspan, column, row = self.__get_column_rowspan(
                 button, column, row
             )
-            button = self.__format_button_label(button, columnspan)
 
-            self._buttons[button] = _TabButton(self, button)
+            formatted_button = self.__format_button_label(button, columnspan)
+
+            self._buttons[button] = _TabButton(self, formatted_button, button)
+
             if column == 0:
                 self._buttons[button].grid(
                     row=row + 1,

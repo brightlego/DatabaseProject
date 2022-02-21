@@ -2,7 +2,7 @@ import tkinter as tk
 
 import gui.templates
 import gui.tabs
-import gui.input
+import gui.input.input_field
 import gui.tabbar
 
 
@@ -16,7 +16,7 @@ class Gui(gui.templates.Page):
         self.__tabbar = gui.tabbar.TabBar(self)
         self.__tabs = gui.tabs.Tabs(self)
 
-        self.__input = gui.input.InputField(self)
+        self.__input = gui.input.input_field.InputField(self)
 
         self.__tabbar.grid(column=0, row=0)
         self.__tabs.grid(column=0, row=1)
