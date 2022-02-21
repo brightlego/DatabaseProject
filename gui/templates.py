@@ -9,3 +9,11 @@ class Page(tk.Frame):
 
     def _init_elements(self, *args, **kwargs):
         pass
+
+
+class HideablePage(Page):
+    def show(self):
+        self.grid()
+
+    def hide(self):
+        self.grid_remove()

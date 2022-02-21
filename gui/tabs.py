@@ -65,17 +65,11 @@ class _TabButton(tk.Button):
         )
 
 
-class __Tab(gui.templates.Page):
+class __Tab(gui.templates.HideablePage):
     _BUTTON_NAMES = []
     _NAME = "Tab"
     _TAB_WIDTH_CHAR = 80
     _BUTTON_WIDTH_CHAR = 10
-
-    def show(self):
-        self.grid()
-
-    def hide(self):
-        self.grid_remove()
 
     def change_input(self, text):
         self._parent.change_input(text)
@@ -140,16 +134,20 @@ class __Tab(gui.templates.Page):
 
 
 class AddTab(__Tab):
+    _NAME = "Add"
     _BUTTON_NAMES = ["Test1", "Test 11"]
 
 
 class GetTab(__Tab):
+    _NAME = "Get"
     _BUTTON_NAMES = ["Test2"]
 
 
 class RemoveTab(__Tab):
+    _NAME = "Remove"
     _BUTTON_NAMES = ["Test3"]
 
 
 class ChangeTab(__Tab):
+    _NAME = "Change"
     _BUTTON_NAMES = ["Test4"]
