@@ -26,20 +26,34 @@ class Gui(gui.page.Page):
         self.__tabbar.grid(column=0, row=0)
         self.__tab_frame.grid(column=0, row=1)
 
-        self.__add_tab.grid(column=0, row=0)
-        self.__get_tab.grid(column=0, row=0)
-        self.__rem_tab.grid(column=0, row=0)
-        self.__chg_tab.grid(column=0, row=0)
+        self.__add_tab.grid(column=0, row=0, in_=self.__tab_frame)
+        self.__get_tab.grid(column=0, row=0, in_=self.__tab_frame)
+        self.__rem_tab.grid(column=0, row=0, in_=self.__tab_frame)
+        self.__chg_tab.grid(column=0, row=0, in_=self.__tab_frame)
+
+        self.pack()
 
     def change_tab(self, tab):
         if tab == "add":
-            self.__add_tab.show()
+            self.__add_tab.show()  # Show
+            self.__get_tab.hide()  #
+            self.__rem_tab.hide()  #
+            self.__chg_tab.hide()  #
         elif tab == "get":
-            self.__get_tab.show()
+            self.__add_tab.hide()  #
+            self.__get_tab.show()  # Show
+            self.__rem_tab.hide()  #
+            self.__chg_tab.hide()  #
         elif tab == "rem":
-            self.__rem_tab.show()
+            self.__add_tab.hide()  #
+            self.__get_tab.hide()  #
+            self.__rem_tab.show()  # Show
+            self.__chg_tab.hide()  #
         elif tab == "chg":
-            self.__chg_tab.show()
+            self.__add_tab.hide()  #
+            self.__get_tab.hide()  #
+            self.__rem_tab.hide()  #
+            self.__chg_tab.show()  # Show
 
     def mainloop(self, *args, **kwargs):
         self.__root.mainloop(*args, **kwargs)
