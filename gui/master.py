@@ -26,14 +26,15 @@ class Gui(gui.page.Page):
         self.__tabbar.grid(column=0, row=0)
         self.__tab_frame.grid(column=0, row=1)
 
-        self.__add_tab.grid(column=0, row=0, in_=self.__tab_frame)
-        self.__get_tab.grid(column=0, row=0, in_=self.__tab_frame)
-        self.__rem_tab.grid(column=0, row=0, in_=self.__tab_frame)
-        self.__chg_tab.grid(column=0, row=0, in_=self.__tab_frame)
+        self.__add_tab.grid(column=0, row=0, in_=self.__tab_frame, sticky=tk.W)
+        self.__get_tab.grid(column=0, row=0, in_=self.__tab_frame, sticky=tk.W)
+        self.__rem_tab.grid(column=0, row=0, in_=self.__tab_frame, sticky=tk.W)
+        self.__chg_tab.grid(column=0, row=0, in_=self.__tab_frame, sticky=tk.W)
 
+        self.change_tab()
         self.pack()
 
-    def change_tab(self, tab):
+    def change_tab(self, tab=None):
         if tab == "add":
             self.__add_tab.show()  # Show
             self.__get_tab.hide()  #
@@ -54,6 +55,11 @@ class Gui(gui.page.Page):
             self.__get_tab.hide()  #
             self.__rem_tab.hide()  #
             self.__chg_tab.show()  # Show
+        elif tab is None:
+            self.__add_tab.hide()  #
+            self.__get_tab.hide()  #
+            self.__rem_tab.hide()  #
+            self.__chg_tab.hide()  #
 
     def mainloop(self, *args, **kwargs):
         self.__root.mainloop(*args, **kwargs)

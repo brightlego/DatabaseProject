@@ -34,6 +34,28 @@ class __Tab(page.Page):
     def hide(self):
         self.grid_remove()
 
+    def __get_column_rowspan(self, button, column, row):
+        columnspan = math.ceil(len(button) / self._BUTTON_WIDTH_CHAR)
+        rowspan = math.ceil(len(button) / self._TAB_WIDTH_CHAR)
+        if rowspan > 1:
+            columnspan = self._TAB_WIDTH_CHAR // self._BUTTON_WIDTH_CHAR
+        if (
+            rowspan > 1
+            or column + columnspan > self._TAB_WIDTH_CHAR / self._BUTTON_WIDTH_CHAR
+        ):
+            column = 0
+
+        return columnspan, rowspan, column, row
+
+    def __format_button_label(self, button):
+        button = [
+            button[i : i + self._TAB_WIDTH_CHAR]
+            for i in range(0, len(button), self._TAB_WIDTH_CHAR)
+        ]
+        button = [_centre(line, self._TAB_WIDTH_CHAR) for line in button]
+        button = "\n".join(button)
+        return button
+
     def _init_elements(self):
         self._buttons = {}
         self._label = tk.Label(self, text=f"{self._NAME}:")
@@ -41,24 +63,11 @@ class __Tab(page.Page):
         row = 1
         column = 0
         for button in self._BUTTON_NAMES:
-            columnspan = math.ceil(len(button) / self._BUTTON_WIDTH_CHAR)
-            rowspan = math.ceil(len(button) / self._TAB_WIDTH_CHAR)
-            if rowspan > 1:
-                columnspan = self._TAB_WIDTH_CHAR // self._BUTTON_WIDTH_CHAR
-            if (
-                rowspan > 1
-                or column + columnspan > self._TAB_WIDTH_CHAR / self._BUTTON_WIDTH_CHAR
-            ):
-                column = 0
+            columnspan, rowspan, column, row = self.__get_column_rowspan(
+                button, column, row
+            )
+            button = self.__format_button_label(button)
 
-            if rowspan == 1:
-                button = _centre(button, self._BUTTON_WIDTH_CHAR)
-            else:
-                button = [
-                    _centre(button[i : i + self._TAB_WIDTH_CHAR], self._TAB_WIDTH_CHAR)
-                    for i in range(0, len(button), self._TAB_WIDTH_CHAR)
-                ]
-                button = "\n".join(button)
             self._buttons[button] = _TabButton(self, button)
             if column == 0:
                 self._buttons[button].grid(
@@ -66,12 +75,17 @@ class __Tab(page.Page):
                     column=column + 1,
                     columnspan=columnspan,
                     rowspan=rowspan,
+                    sticky=tk.W,
                 )
                 row += rowspan
                 column += columnspan
             else:
                 self._buttons[button].grid(
-                    row=row, column=column + 1, columnspan=columnspan, rowspan=rowspan
+                    row=row,
+                    column=column + 1,
+                    columnspan=columnspan,
+                    rowspan=rowspan,
+                    sticky=tk.W,
                 )
                 column += columnspan
 
