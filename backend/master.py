@@ -1,6 +1,6 @@
 import sqlite3
 
-DB_NAME = "sunnytots.db"
+DB_NAME = "backend/sunnytots.db"
 
 
 class Backend:
