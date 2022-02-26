@@ -4,8 +4,9 @@ import gui.templates
 
 
 def _centre(text, width, filler=" "):
-    text = text.rjust(width // 2, filler)
-    text = text.ljust(width, filler)
+    count_to_add = width - len(text)
+    text = text.rjust(len(text) + count_to_add // 2, filler)
+    text = text.ljust(len(text) + count_to_add, filler)
     return text
 
 
@@ -51,6 +52,9 @@ class Tabs(gui.templates.Page):
     def change_input(self, text):
         self._parent.change_input(text)
 
+    def get_xml_cache(self):
+        return self._parent.get_xml_cache()
+
 
 class _TabButton(tk.Button):
     def __init__(self, parent, text, command, *args, **kwargs):
@@ -66,7 +70,6 @@ class _TabButton(tk.Button):
 
 
 class __Tab(gui.templates.HideablePage):
-    _BUTTON_NAMES = []
     _NAME = "Tab"
     _TAB_WIDTH_CHAR = 80
     _BUTTON_WIDTH_CHAR = 10
@@ -99,20 +102,28 @@ class __Tab(gui.templates.HideablePage):
             button = _centre(button, self._BUTTON_WIDTH_CHAR * columnspan)
         return button
 
-    def _init_elements(self):
+    def _get_button_names(self):
+        return []
+
+    def _get_xml_cache(self, title):
+        pass
+
+    def _init_elements(self, button_names=[]):
         self._buttons = {}
-        self._label = tk.Label(self, text=f"{self._NAME}:")
+        self._label = tk.Label(self, text=f"{self._NAME.title()}:")
         self._label.grid(column=0, row=0)
         row = 1
         column = 0
-        for button in self._BUTTON_NAMES:
+        for button in self._get_button_names():
             columnspan, rowspan, column, row = self.__get_column_rowspan(
                 button, column, row
             )
 
             formatted_button = self.__format_button_label(button, columnspan)
 
-            self._buttons[button] = _TabButton(self, formatted_button, button)
+            self._buttons[button] = _TabButton(
+                self, formatted_button, self._get_xml_cache(button)
+            )
 
             if column == 0:
                 self._buttons[button].grid(
@@ -136,20 +147,48 @@ class __Tab(gui.templates.HideablePage):
 
 
 class AddTab(__Tab):
-    _NAME = "Add"
-    _BUTTON_NAMES = ["Test1", "Test 11"]
+    _NAME = "add"
+
+    def _get_button_names(self):
+        xml_cache = self._parent.get_xml_cache()
+        return xml_cache.add_cache.keys()
+
+    def _get_xml_cache(self, title):
+        xml_cache = self._parent.get_xml_cache()
+        return xml_cache.add_cache[title]
 
 
 class GetTab(__Tab):
-    _NAME = "Get"
-    _BUTTON_NAMES = ["Test2"]
+    _NAME = "get"
+
+    def _get_button_names(self):
+        xml_cache = self._parent.get_xml_cache()
+        return xml_cache.get_cache.keys()
+
+    def _get_xml_cache(self, title):
+        xml_cache = self._parent.get_xml_cache()
+        return xml_cache.get_cache[title]
 
 
 class RemoveTab(__Tab):
-    _NAME = "Remove"
-    _BUTTON_NAMES = ["Test3"]
+    _NAME = "remove"
+
+    def _get_button_names(self):
+        xml_cache = self._parent.get_xml_cache()
+        return xml_cache.rem_cache.keys()
+
+    def _get_xml_cache(self, title):
+        xml_cache = self._parent.get_xml_cache()
+        return xml_cache.rem_cache[title]
 
 
 class ChangeTab(__Tab):
-    _NAME = "Change"
-    _BUTTON_NAMES = ["Test4"]
+    _NAME = "change"
+
+    def _get_button_names(self):
+        xml_cache = self._parent.get_xml_cache()
+        return xml_cache.chg_cache.keys()
+
+    def _get_xml_cache(self, title):
+        xml_cache = self._parent.get_xml_cache()
+        return xml_cache.chg_cache[title]

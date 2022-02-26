@@ -1,0 +1,6 @@
+<input-box title="Add New Caregivers">
+  <enter label="Name" table="Caregivers" fieldname="Name"/>
+  <enter label="Address" table="Caregivers" fieldname="PhysicalAddress"/>
+  <enter label="Email" table="Caregivers" fieldname="EmailAddress"/>
+  <enter label="Phone Number" table="Caregivers" fieldname="ContactNumber"/>
+</input-box>

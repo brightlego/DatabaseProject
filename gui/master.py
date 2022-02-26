@@ -4,12 +4,14 @@ import gui.templates
 import gui.tabs
 import gui.input.input_field
 import gui.tabbar
+import gui.input.input_xml_cache
 
 
 class Gui(gui.templates.Page):
     def __init__(self, backend):
         self.__backend = backend
         self.__root = tk.Tk()
+        self.__xml_cache = gui.input.input_xml_cache.XMLCache()
         super().__init__(self.__root)
 
     def _init_elements(self):
@@ -23,6 +25,9 @@ class Gui(gui.templates.Page):
 
         self.change_tab()
         self.pack()
+
+    def get_xml_cache(self):
+        return self.__xml_cache
 
     def change_tab(self, tab=None):
         self.__tabs.change_tab(tab)
