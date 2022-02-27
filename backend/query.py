@@ -8,6 +8,7 @@ class Query:
         self._tables = set()
         self._data = {}
         self._constraints = {}
+        self._links = {}
         self._order_by = order_by
         self._order_asc = order_asc
 
@@ -16,7 +17,7 @@ class Query:
         self._tables.add(table)
 
     def add_link(self, field1, field2, table1, table2):
-        self._constraints[
+        self._links[
             f"{escape(table1)}.{escape(field1)}"
         ] = f"{escape(table2)}.{escape(field2)}"
         self._tables.add(table1)
@@ -31,9 +32,14 @@ class Query:
 
     def _gen_constraint_query(self):
         out = []
-        for _ in self._constraints:
-            out.append("WHERE ?=?")
-        return " AND ".join(out)
+        for field in self._constraints:
+            out.append(f"{field}=?")
+        for field in self._links:
+            out.append(f"{field}={self._links[field]}")
+        out = " AND ".join(out)
+        if out:
+            out = "WHERE " + out
+        return out
 
     def _gen_table_query(self):
         out = []
@@ -48,19 +54,22 @@ class Query:
 class AddQuery(Query):
     def _gen_data_query(self):
         fields = []
-        for _ in self._data:
-            fields.append("?")
+        values = []
+        for field in self._data:
+            fields.append(field)
+            values.append("?")
         fields = ",".join(fields)
-
-        values = fields
+        values = ",".join(values)
 
         return f"({fields}) VALUES ({values})"
+
+    def update_data(self, field, table, value=None):
+        self._data[f"{escape(field)}"] = value
+        self._tables.add(table)
 
     def generate_query(self):
         text = f"""INSERT INTO {self._gen_table_query()} {self._gen_data_query()}"""
         params = []
-        for field in self._data:
-            params.append(field)
         for field in self._data:
             params.append(self._data[field])
 
@@ -70,21 +79,16 @@ class AddQuery(Query):
 class GetQuery(Query):
     def _gen_data_query(self):
         fields = []
-        for _ in self._data:
-            fields.append("?")
+        for field in self._data:
+            fields.append(field)
         fields = ",".join(fields)
         return fields
 
     def generate_query(self):
-        text = f"""SELECT {self._gen_data_query()} FROM {self._gen_table_query()}
-                         WHERE {self._gen_constraint_query()}"""
+        text = f"""SELECT {self._gen_data_query()} FROM {self._gen_table_query()} {self._gen_constraint_query()}"""
         params = []
 
-        for field in self._data:
-            params.append(field)
-
         for field in self._constraints:
-            params.append(field)
             params.append(self._constraints[field])
 
         if self._order_by is not None:
@@ -100,11 +104,21 @@ class GetQuery(Query):
 
 class RemoveQuery(Query):
     def generate_query(self):
-        text = f"""DELTE FROM {self._gen_table_query()} WHERE {self._gen_constraint_query()}"""
+        text = (
+            f"""DELTE FROM {self._gen_table_query()} {self._gen_constraint_query()}"""
+        )
         params = []
 
         for field in self._constraints:
-            params.append(field)
             params.append(self._constraints[field])
 
         return text, params
+
+
+class ChangeQuery(Query):
+    pass
+
+
+class NullQuery(Query):
+    def generate_query(self):
+        return "", []

@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 
 import gui.templates
 import gui.tabs
@@ -18,13 +19,20 @@ class Gui(gui.templates.Page):
         self.__tabbar = gui.tabbar.TabBar(self)
         self.__tabs = gui.tabs.Tabs(self)
 
-        self.__input = gui.input.input_field.InputField(self)
+        self.__input = gui.input.input_field.InputField(
+            self, parent_kwargs={"relief": tk.GROOVE}
+        )
+
+        ttk.Separator(self, orient=tk.HORIZONTAL).grid(
+            column=0, row=2, columnspan=100, sticky="ew"
+        )
 
         self.__tabbar.grid(column=0, row=0)
         self.__tabs.grid(column=0, row=1)
+        self.__input.grid(column=0, row=3)
 
         self.change_tab()
-        self.pack()
+        self.pack(expand=True, fill=tk.BOTH)
 
     def get_xml_cache(self):
         return self.__xml_cache
@@ -32,8 +40,11 @@ class Gui(gui.templates.Page):
     def change_tab(self, tab=None):
         self.__tabs.change_tab(tab)
 
-    def change_input(self, text):
-        print(text)
+    def change_input(self, template):
+        self.__input.set_template(template)
+
+    def gen_new_query(self, type_):
+        return self.__backend.gen_new_query(type_)
 
     def mainloop(self, *args, **kwargs):
         self.__root.mainloop(*args, **kwargs)

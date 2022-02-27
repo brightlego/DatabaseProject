@@ -2,13 +2,20 @@ import tkinter as tk
 
 
 class Page(tk.Frame):
-    def __init__(self, parent, *args, **kwargs):
+    def __init__(self, parent, *args, parent_kwargs=None, **kwargs):
         self._parent = parent
-        super().__init__(parent)
+        if parent_kwargs is None:
+            parent_kwargs = {}
+        super().__init__(parent, **parent_kwargs)
         self._init_elements(*args, **kwargs)
 
     def _init_elements(self, *args, **kwargs):
         pass
+
+
+class HollowPage(Page):
+    def __getattr__(self, name):
+        return self._parent.__getattr__(name)
 
 
 class HideablePage(Page):
