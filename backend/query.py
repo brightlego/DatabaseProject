@@ -4,7 +4,7 @@ QUERY_TYPES = ["add", "get", "remove", "change"]
 
 
 class Query:
-    def __init__(self, order_by=None, order_asc=True):
+    def __init__(self, order_by=None, order_asc=True, limit=1):
         self._tables = set()
         self._fields = {}
         self._data = {}
@@ -13,6 +13,7 @@ class Query:
         self._links = {}
         self._order_by = order_by
         self._order_asc = order_asc
+        self._limit = limit
         self._gen_antiquery()
 
     def update_constraint(self, field, table, value):
@@ -67,6 +68,10 @@ class Query:
     def _gen_antiquery(self):
         self._antiquery = NullQuery()
 
+    def _finalise_query(self, query):
+        query += f" LIMIT {self._limit}"
+        return query
+
     def _get_fields(self):
         return None
 
@@ -104,6 +109,7 @@ class AddQuery(Query):
         for field in self._data:
             params.append(self._data[field])
 
+        query = self._finalise_query(query)
         return text, params
 
 
@@ -137,6 +143,8 @@ class GetQuery(Query):
                 text += "DESC"
             params.append(self._order_by)
 
+        query = self._finalise_query(query)
+
         return text, params
 
 
@@ -153,12 +161,36 @@ class RemoveQuery(Query):
         for field in self._constraints:
             params.append(self._constraints[field])
 
+        query = self._finalise_query(query)
         return text, params
 
 
 class ChangeQuery(Query):
+    def update_data(self, field, table, value):
+        self._data[f"{escape(field)}"] = value
+        self._tables.add(table)
+
+    def _gen_data_query(self):
+        out = []
+        for field in self._data:
+            out.append(f"{field}=?")
+        out = ", ".join(out)
+        return out
+
+    def generate_query(self):
+        text = f"""UPDATE {self._gen_table_query()} SET {self._gen_data_query()} {self._gen_constraint_query()}"""
+        params = []
+
+        for field in self._data:
+            params.append(self._data[field])
+
+        for field in self._constraints:
+            params.append(self._constraints[field])
+
+        return text, params
+
     def _gen_antiquery(self):
-        self._antiquery = ChangeQuery()
+        self._antiquery = AntiChangeQuery()
 
 
 class AntiAddQuery(RemoveQuery):
