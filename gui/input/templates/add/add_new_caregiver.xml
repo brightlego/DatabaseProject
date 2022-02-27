@@ -6,7 +6,7 @@
   <set-data>
     <entry label="Name" table="Caregivers" field="Name"/>
     <entry label="Address" table="Caregivers" field="PhysicalAddress"/>
-    <entry label="Email" table="Caregivers" field="EmailAddress"/>
-    <entry label="Phone Number" table="Caregivers" field="ContactNumber"/>
+    <email label="Email" table="Caregivers" field="EmailAddress"/>
+    <phone label="Phone Number" table="Caregivers" field="ContactNumber"/>
   </set-data>
 </input-box>

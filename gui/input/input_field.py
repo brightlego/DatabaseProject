@@ -1,5 +1,6 @@
 import tkinter as tk
 import gui.templates
+import re
 
 
 class InputField(gui.templates.Page):
@@ -57,6 +58,10 @@ class InputField(gui.templates.Page):
         for item in root:
             if item.tag == "entry":
                 self.__elements.append(Entry(parent, item, row, root.tag))
+            elif item.tag == "phone":
+                self.__elements.append(PhoneNum(parent, item, row, root.tag))
+            elif item.tag == "email":
+                self.__elements.append(Email(parent, item, row, root.tag))
             elif item.tag == "optional":
                 self.__set_data(self.__optionalbox, item)
             row += 1
@@ -66,10 +71,15 @@ class InputField(gui.templates.Page):
 
     def set_query(self):
         for element in self.__elements:
-            element.set_query()
+            error = element.set_query()
+            if error is ValueError:
+                return ValueError
+        return None
 
     def submit_query(self):
-        self.set_query()
+        error = self.set_query()
+        if error is ValueError:
+            return
         self._parent.submit_query(self.__query)
 
 
@@ -87,37 +97,79 @@ class OptionalBox(gui.templates.HollowPage):
         self.__label.grid(column=0, columnspan=10, row=0)
 
 
-class Entry:
+class Input:
     def __init__(self, parent, item, row, type_):
-        self.__parent = parent
-        self.__item = item
-        self.__type = type_
-        attrib = item.attrib
-        self.__label = tk.Label(parent, text=attrib["label"])
-        self.__entryvar = tk.StringVar()
-        self.__entry = tk.Entry(parent, textvariable=self.__entryvar)
+        self._parent = parent
+        self._item = item
+        self._type = type_
+        self._row = row
+        self._init_elements()
 
-        self.__label.grid(column=1, row=row, sticky=tk.E)
-        self.__entry.grid(column=2, row=row)
+    def _init_elements(self):
+        attrib = self._item.attrib
+        self._label = tk.Label(self._parent, text=attrib["label"])
+        self._entryvar = tk.StringVar()
+        self._entry = tk.Entry(self._parent, textvariable=self._entryvar)
+
+        self._label.grid(column=1, row=self._row, sticky=tk.E)
+        self._entry.grid(column=2, row=self._row)
 
     def destroy(self):
-        self.__label.destroy()
-        self.__entry.destroy()
+        self._label.destroy()
+        self._entry.destroy()
 
     def set_query(self):
-        query = self.__parent.get_query()
-        if self.__type == "search-data":
+        if not self._validate():
+            self._label.config(fg="#c00")
+            return ValueError
+        else:
+            self._label.config(fg="#000")
+        query = self._parent.get_query()
+        if self._type == "search-data":
             query.update_constraint(
-                self.__item.attrib["field"],
-                self.__item.attrib["table"],
-                self.__entryvar.get(),
+                self._item.attrib["field"],
+                self._item.attrib["table"],
+                self._entryvar.get(),
             )
         else:
             query.update_data(
-                self.__item.attrib["field"],
-                self.__item.attrib["table"],
-                self.__entryvar.get(),
+                self._item.attrib["field"],
+                self._item.attrib["table"],
+                self._entryvar.get(),
             )
+        return None
+
+    def _validate(self):
+        return True
+
+
+class Entry(Input):
+    pass
+
+
+class PhoneNum(Input):
+    def _validate(self):
+        text = self._entryvar.get()
+        # \+? -- The number may start with a plus
+        # ((\(?\d+\)?)(-|\s+))+ -- It is followed by at least one:
+        #     (\(?\d+\)?)? -- Maybe some digits which might be in brackets
+        #     (-|\s+) -- a hyphen or some whitespace
+        # e.g.
+        #   +44 1865 242191
+        #   01865 253432
+        #   +1 (201) 4132-7351
+        #   +389-326-385-0068
+        if re.match(r"^\+?((\(?\d+\)?)?(-|\s+)?)+$", text):
+            return True
+        else:
+            return super()._validate()
+
+
+class Email(Input):
+    def _validate(self):
+        # The only way to validate an email without sending a confirmation
+        # message or excluding valid emails.
+        return "@" in self._entryvar.get()
 
 
 class SubmitButton(gui.templates.Button):
