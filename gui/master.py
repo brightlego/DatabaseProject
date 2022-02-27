@@ -46,5 +46,16 @@ class Gui(gui.templates.Page):
     def gen_new_query(self, type_):
         return self.__backend.gen_new_query(type_)
 
+    def submit_query(self, query):
+        print(query.generate_query())
+        # self.__backend.handle_query(self.__input.get_query())
+
+    def destroy(self):
+        self.__backend.commit()
+        super().destroy()
+
+    def undo(self):
+        self.__backend.undo()
+
     def mainloop(self, *args, **kwargs):
         self.__root.mainloop(*args, **kwargs)

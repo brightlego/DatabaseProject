@@ -36,4 +36,4 @@ class Backend:
         elif type == "remove":
             return backend.query.RemoveQuery()
         else:
-            return backend.query.Query()
+            return backend.query.NullQuery()

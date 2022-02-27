@@ -10,10 +10,12 @@ class InputField(gui.templates.Page):
         self.__elements = []
         self.__title = tk.Label(self)
         self.__query = None
+        self.__submit_button = SubmitButton(self)
 
         self.__title.pack()
         self.__searchdata.pack(expand=True, fill=tk.BOTH, pady=10)
         self.__setdata.pack(expand=True, fill=tk.BOTH, pady=10)
+        self.__submit_button.pack(anchor=tk.SE)
         self.__optionalbox.grid(column=1, columnspan=100, row=100, pady=10)
 
     def set_template(self, template):
@@ -43,6 +45,10 @@ class InputField(gui.templates.Page):
     def set_query(self):
         for element in self.__elements:
             element.set_query()
+
+    def submit_query(self):
+        self.set_query()
+        self._parent.submit_query(self.__query)
 
 
 class SearchData(gui.templates.HollowPage):
@@ -90,3 +96,11 @@ class Entry:
                 self.__item.attrib["table"],
                 self.__entryvar.get(),
             )
+
+
+class SubmitButton(gui.templates.Page):
+    def _init_elements(self):
+        self.__button = tk.Button(
+            self, text="submit", command=lambda: self._parent.submit_query()
+        )
+        self.__button.pack()

@@ -12,6 +12,9 @@ class Page(tk.Frame):
     def _init_elements(self, *args, **kwargs):
         pass
 
+    def __getattr__(self, name):
+        return self.__getattribute__(name)
+
 
 class HollowPage(Page):
     def __getattr__(self, name):

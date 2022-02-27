@@ -1,12 +1,14 @@
 <input-box title="Add New Caregivers" type="add">
+  <!--
   <search-data>
     <optional>
     </optional>
   </search-data>
+  -->
   <set-data>
-    <entry label="Name" table="Caregivers" fieldname="Name"/>
-    <entry label="Address" table="Caregivers" fieldname="PhysicalAddress"/>
-    <entry label="Email" table="Caregivers" fieldname="EmailAddress"/>
-    <entry label="Phone Number" table="Caregivers" fieldname="ContactNumber"/>
+    <entry label="Name" table="Caregivers" field="Name"/>
+    <entry label="Address" table="Caregivers" field="PhysicalAddress"/>
+    <entry label="Email" table="Caregivers" field="EmailAddress"/>
+    <entry label="Phone Number" table="Caregivers" field="ContactNumber"/>
   </set-data>
 </input-box>

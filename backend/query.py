@@ -11,6 +11,7 @@ class Query:
         self._links = {}
         self._order_by = order_by
         self._order_asc = order_asc
+        self._gen_antiquery()
 
     def update_constraint(self, field, table, value):
         self._constraints[f"{escape(table)}.{escape(field)}"] = value
@@ -50,8 +51,22 @@ class Query:
     def generate_query(self):
         pass
 
+    def _gen_antiquery(self):
+        self._antiquery = NullQuery()
+
+
+class NullQuery(Query):
+    def _gen_antiquery(self):
+        self._antiquery = self
+
+    def generate_query(self):
+        return "", []
+
 
 class AddQuery(Query):
+    def _gen_antiquery(self):
+        self._antiquery = AntiAddQuery()
+
     def _gen_data_query(self):
         fields = []
         values = []
@@ -77,6 +92,9 @@ class AddQuery(Query):
 
 
 class GetQuery(Query):
+    def _gen_antiquery(self):
+        self._antiquery = AntiGetQuery()
+
     def _gen_data_query(self):
         fields = []
         for field in self._data:
@@ -103,6 +121,9 @@ class GetQuery(Query):
 
 
 class RemoveQuery(Query):
+    def _gen_antiquery(self):
+        self._antiquery = AntiRemoveQuery()
+
     def generate_query(self):
         text = (
             f"""DELTE FROM {self._gen_table_query()} {self._gen_constraint_query()}"""
@@ -116,9 +137,25 @@ class RemoveQuery(Query):
 
 
 class ChangeQuery(Query):
-    pass
+    def _gen_antiquery(self):
+        self._antiquery = ChangeQuery()
 
 
-class NullQuery(Query):
-    def generate_query(self):
-        return "", []
+class AntiAddQuery(RemoveQuery):
+    def _gen_antiquery(self):
+        pass
+
+
+class AntiGetQuery(NullQuery):
+    def _gen_antiquery(self):
+        pass
+
+
+class AntiRemoveQuery(AddQuery):
+    def _gen_antiquery(self):
+        pass
+
+
+class AntiChangeQuery(ChangeQuery):
+    def _gen_antiquery(self):
+        pass
