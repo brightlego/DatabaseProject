@@ -109,7 +109,7 @@ class AddQuery(Query):
         for field in self._data:
             params.append(self._data[field])
 
-        query = self._finalise_query(query)
+        text = self._finalise_query(text)
         return text, params
 
 
@@ -143,7 +143,7 @@ class GetQuery(Query):
                 text += "DESC"
             params.append(self._order_by)
 
-        query = self._finalise_query(query)
+        text = self._finalise_query(text)
 
         return text, params
 
@@ -161,7 +161,7 @@ class RemoveQuery(Query):
         for field in self._constraints:
             params.append(self._constraints[field])
 
-        query = self._finalise_query(query)
+        text = self._finalise_query(text)
         return text, params
 
 
@@ -186,6 +186,8 @@ class ChangeQuery(Query):
 
         for field in self._constraints:
             params.append(self._constraints[field])
+
+        text = self._finalise_query(text)
 
         return text, params
 
