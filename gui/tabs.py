@@ -12,6 +12,7 @@ def _centre(text, width, filler=" "):
 
 class Tabs(gui.templates.Page):
     def _init_elements(self):
+        self.__variable = tk.StringVar()
         self.__add_tab = gui.tabs.AddTab(self)
         self.__get_tab = gui.tabs.GetTab(self)
         self.__rem_tab = gui.tabs.RemoveTab(self)
@@ -52,21 +53,32 @@ class Tabs(gui.templates.Page):
     def change_input(self, text):
         self._parent.change_input(text)
 
+    def get_tab_var(self):
+        return self.__variable
+
     def get_xml_cache(self):
         return self._parent.get_xml_cache()
 
 
-class _TabButton(tk.Button):
-    def __init__(self, parent, text, command, *args, **kwargs):
+class TabButton(tk.Radiobutton):
+    def __init__(self, parent, text, command, width, height, *args, **kwargs):
         self.__text = text
         self.__parent = parent
+        self.__variable = self.__parent.get_variable()
+        print(self.__variable)
         super().__init__(
             parent,
             *args,
             text=self.__text,
+            variable=self.__variable,
+            value=self.__text,
             command=lambda: self.__parent.change_input(command),
+            width=width,
+            height=height + 1,
+            indicatoron=False,
             **kwargs,
         )
+        self.deselect()
 
 
 class __Tab(gui.templates.HideablePage):
@@ -102,6 +114,9 @@ class __Tab(gui.templates.HideablePage):
             button = _centre(button, self._BUTTON_WIDTH_CHAR * columnspan)
         return button
 
+    def get_variable(self):
+        return self._parent.get_tab_var()
+
     def _get_button_names(self):
         return []
 
@@ -109,9 +124,10 @@ class __Tab(gui.templates.HideablePage):
         pass
 
     def _init_elements(self, button_names=[]):
+        self._variable = tk.StringVar()
         self._buttons = {}
-        self._label = tk.Label(self, text=f"{self._NAME.title()}:")
-        self._label.grid(column=0, row=0)
+        # self._label = tk.Label(self, text=f"{self._NAME.title()}:")
+        # self._label.grid(column=0, row=0)
         row = 1
         column = 0
         for button in self._get_button_names():
@@ -121,8 +137,12 @@ class __Tab(gui.templates.HideablePage):
 
             formatted_button = self.__format_button_label(button, columnspan)
 
-            self._buttons[button] = _TabButton(
-                self, formatted_button, self._get_xml_cache(button)
+            self._buttons[button] = TabButton(
+                self,
+                button,
+                self._get_xml_cache(button),
+                columnspan * self._BUTTON_WIDTH_CHAR,
+                rowspan,
             )
 
             if column == 0:

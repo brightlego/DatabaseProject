@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.messagebox as tkmessagebox
 from tkinter import ttk
 
 import gui.templates
@@ -12,7 +13,7 @@ import gui.undo
 class Gui(gui.templates.Page):
     def __init__(self, backend):
         self.__backend = backend
-        self.__root = tk.Tk()
+        self.__root = GuiRoot(self)
         self.__xml_cache = gui.input.input_xml_cache.XMLCache()
         super().__init__(self.__root)
 
@@ -28,14 +29,14 @@ class Gui(gui.templates.Page):
         self.__undo_buton = gui.undo.UndoButton(self)
 
         ttk.Separator(self, orient=tk.HORIZONTAL).grid(
-            column=0, row=2, columnspan=100, sticky="ew"
+            column=0, row=2, columnspan=100, sticky=tk.EW
         )
         ttk.Separator(self, orient=tk.HORIZONTAL).grid(
-            column=0, row=4, columnspan=100, sticky="ew"
+            column=0, row=4, columnspan=100, sticky=tk.EW
         )
 
-        self.__tabbar.grid(column=0, row=0)
-        self.__tabs.grid(column=0, row=1)
+        self.__tabbar.grid(column=0, row=0, sticky=tk.W)
+        self.__tabs.grid(column=0, row=1, pady=5, sticky=tk.W)
         self.__input.grid(column=0, row=3)
         self.__input.grid_remove()
         self.__undo_buton.grid(column=0, row=5, sticky=tk.W)
@@ -62,12 +63,33 @@ class Gui(gui.templates.Page):
         print(query.generate_query())
         # self.__backend.handle_query(query)
 
-    def destroy(self):
+    def commit(self):
+        self.__backend.commit()
+
+    def rollback(self):
         self.__backend.rollback()
-        super().destroy()
 
     def undo(self):
         self.__backend.undo()
 
     def mainloop(self, *args, **kwargs):
         self.__root.mainloop(*args, **kwargs)
+
+
+class GuiRoot(tk.Tk):
+    def __init__(self, gui):
+        self.__gui = gui
+        super().__init__()
+
+    def destroy(self):
+        answer = tkmessagebox.askyesnocancel(
+            title="Exiting", message="Do you want to save changes to the database?"
+        )
+        if answer is None:
+            return
+        elif answer:
+            self.__gui.commit()
+            super().destroy()
+        else:
+            self.__gui.rollback()
+            super().destroy()
