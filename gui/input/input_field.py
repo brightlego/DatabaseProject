@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkcalendar
 import gui.templates
 import re
 
@@ -33,11 +34,12 @@ class InputField(gui.templates.Page):
                 self.__set_data(self.__searchdata, item)
             elif item.tag == "set-data":
                 self.__set_data(self.__setdata, item)
+            elif item.tag == "constraints":
+                self.__set_data(self, item)
 
         self.__check_empty_widgets()
 
     def __check_empty_widgets(self):
-        print(self.__searchdata.winfo_children())
         if len(self.__searchdata.winfo_children()) <= 1:
             self.__searchdata.grid_remove()
         else:
@@ -48,7 +50,7 @@ class InputField(gui.templates.Page):
         else:
             self.__setdata.grid()
 
-        if len(self.__optionalbox.winfo_children()) == 0:
+        if len(self.__optionalbox.winfo_children()) <= 1:
             self.__optionalbox.grid_remove()
         else:
             self.__optionalbox.grid()
@@ -62,6 +64,16 @@ class InputField(gui.templates.Page):
                 self.__elements.append(PhoneNum(parent, item, row, root.tag))
             elif item.tag == "email":
                 self.__elements.append(Email(parent, item, row, root.tag))
+            elif item.tag == "radio":
+                self.__elements.append(Radio(parent, item, row, root.tag))
+            elif item.tag == "date":
+                self.__elements.append(Date(parent, item, row, root.tag))
+            elif item.tag == "link":
+                self.__elements.append(Link(parent, item, row, root.tag))
+            elif item.tag == "get-data":
+                self.__elements.append(Data(parent, item, row, root.tag))
+            elif item.tag == "custom":
+                self.__elements.append(Custom(parent, item, row, root.tag))
             elif item.tag == "optional":
                 self.__set_data(self.__optionalbox, item)
             row += 1
@@ -81,6 +93,7 @@ class InputField(gui.templates.Page):
         if error is ValueError:
             return
         self._parent.submit_query(self.__query)
+        self.__query = type(self.__query)()
 
 
 class SearchData(gui.templates.HollowPage):
@@ -118,6 +131,9 @@ class Input:
         self._label.destroy()
         self._entry.destroy()
 
+    def get(self):
+        self._entryvar.get()
+
     def set_query(self):
         if not self._validate():
             self._label.config(fg="#c00")
@@ -127,15 +143,11 @@ class Input:
         query = self._parent.get_query()
         if self._type == "search-data":
             query.update_constraint(
-                self._item.attrib["field"],
-                self._item.attrib["table"],
-                self._entryvar.get(),
+                self._item.attrib["field"], self._item.attrib["table"], self.get(),
             )
         else:
             query.update_data(
-                self._item.attrib["field"],
-                self._item.attrib["table"],
-                self._entryvar.get(),
+                self._item.attrib["field"], self._item.attrib["table"], self.get(),
             )
         return None
 
@@ -170,6 +182,111 @@ class Email(Input):
         # The only way to validate an email without sending a confirmation
         # message or excluding valid emails.
         return "@" in self._entryvar.get()
+
+
+class Radio(Input):
+    def _init_elements(self):
+        attrib = self._item.attrib
+        self._label = tk.Label(self._parent, text=attrib["label"])
+        self._entryvar = tk.StringVar()
+        self._label.grid(row=self._row, column=0)
+        column = 1
+        self._radios = []
+        for item in self._item:
+            value = item.attrib["value"]
+            radio = tk.Radiobutton(
+                self._parent, text=item.text, variable=self._entryvar, value=value,
+            )
+            radio.grid(row=self._row, column=column)
+            self._radios.append(radio)
+            column += 1
+
+    def get(self):
+        value = self._entryvar.get()
+        dtype = self._item.attrib["dtype"]
+        if dtype == "int":
+            try:
+                value = int(value)
+            except ValueError:
+                value = 0
+        elif dtype == "bool":
+            value = value == "True"
+        elif dtype == "float":
+            value = float(value)
+        return value
+
+    def destroy(self):
+        self._label.destroy()
+        for radio in self._radios:
+            radio.destroy()
+
+
+class Date(Input):
+    def _init_elements(self):
+        attrib = self._item.attrib
+        self._label = tk.Label(self._parent, text=attrib["label"])
+        self._label.grid(row=self._row, column=0)
+        self._entryvar = tk.StringVar()
+        self._calendar = tkcalendar.Calendar(
+            self._parent,
+            year=2023,
+            month=1,
+            day=1,
+            date_pattern="y-mm-dd",
+            variable=self._entryvar,
+        )
+        self._calendar.grid(row=self._row, column=1, pady=10, padx=10)
+
+    def get(self):
+        return self._calendar.get_date()
+
+    def destroy(self):
+        self._label.destroy()
+        self._calendar.destroy()
+
+
+class Custom(Input):
+    def _init_elements(self):
+        return
+
+    def set_query(self):
+        query = self._parent.get_query()
+        query.add_custom_constraint(self._item.text)
+
+    def destroy(self):
+        return
+
+
+class Link(Input):
+    def _init_elements(self):
+        return
+
+    def set_query(self):
+        query = self._parent.get_query()
+        table1 = self._item[0].attrib["table"]
+        field1 = self._item[0].attrib["field"]
+        table2 = self._item[1].attrib["table"]
+        field2 = self._item[1].attrib["field"]
+
+        query.add_link(field1, field2, table1, table2)
+
+    def destroy(self):
+        return
+
+
+class Data(Input):
+    def _init_elements(self):
+        return
+
+    def set_query(self):
+        query = self._parent.get_query()
+        table = self._item.attrib["table"]
+        field = self._item.attrib["field"]
+
+        query.update_data(field, table)
+
+    def destroy(self):
+        return
 
 
 class SubmitButton(gui.templates.Button):

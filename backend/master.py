@@ -17,10 +17,10 @@ class Backend:
     def handle_query(self, query):
         self.__history.append(copy.deepcopy(query))
         qtext, param = query.generate_query()
-        self.__connection.execute(qtext, param)
+        result = self.__connection.execute(qtext, param)
+        return result
 
     def commit(self):
-        print("Commiting to database")
         self.__connection.commit()
 
     def rollback(self):
@@ -29,11 +29,11 @@ class Backend:
     def gen_new_query(self, type_):
         if type_ == "add":
             return backend.query.AddQuery()
-        elif type == "get":
+        elif type_ == "get":
             return backend.query.GetQuery()
-        elif type == "change":
+        elif type_ == "change":
             return backend.query.ChangeQuery()
-        elif type == "remove":
+        elif type_ == "remove":
             return backend.query.RemoveQuery()
         else:
             return backend.query.NullQuery()

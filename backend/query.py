@@ -6,8 +6,10 @@ QUERY_TYPES = ["add", "get", "remove", "change"]
 class Query:
     def __init__(self, order_by=None, order_asc=True):
         self._tables = set()
+        self._fields = {}
         self._data = {}
         self._constraints = {}
+        self._custom_constraints = []
         self._links = {}
         self._order_by = order_by
         self._order_asc = order_asc
@@ -24,7 +26,16 @@ class Query:
         self._tables.add(table1)
         self._tables.add(table2)
 
+    def add_custom_constraint(self, constraint):
+        self._custom_constraints.append(constraint)
+
     def update_data(self, field, table, value=None):
+
+        if value is None:
+            if table in self._fields:
+                self._fields[table].append(field)
+            else:
+                self._fields[table] = [field]
         self._data[f"{escape(table)}.{escape(field)}"] = value
         self._tables.add(table)
 
@@ -37,6 +48,8 @@ class Query:
             out.append(f"{field}=?")
         for field in self._links:
             out.append(f"{field}={self._links[field]}")
+        for constraint in self._custom_constraints:
+            out.append(f"({constraint})")
         out = " AND ".join(out)
         if out:
             out = "WHERE " + out
@@ -53,6 +66,9 @@ class Query:
 
     def _gen_antiquery(self):
         self._antiquery = NullQuery()
+
+    def _get_fields(self):
+        return None
 
 
 class NullQuery(Query):
@@ -95,10 +111,14 @@ class GetQuery(Query):
     def _gen_antiquery(self):
         self._antiquery = AntiGetQuery()
 
+    def get_fields(self):
+        return self._fields
+
     def _gen_data_query(self):
         fields = []
-        for field in self._data:
-            fields.append(field)
+        for table in self._fields:
+            for field in self._fields[table]:
+                fields.append(f"{escape(table)}.{escape(field)}")
         fields = ",".join(fields)
         return fields
 

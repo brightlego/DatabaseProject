@@ -1,0 +1,33 @@
+<input-box title="Get Children From Session" type="get">
+  <search-data>
+    <date label="Session Date" table="Sessions" field="Date"/>
+    <radio label="Sesion Type" table="Sessions" field="SessionType" dtype="str">
+      <element value="M">Morning</element>
+      <element value="A">Afternoon</element>
+    </radio>
+    <optional>
+
+    </optional>
+  </search-data>
+
+
+  <set-data>
+
+  </set-data>
+  <constraints>
+    <get-data table="Children" field="ChildName"/>
+    <link>
+      <table-field table="Children" field="ChildID"/>
+      <table-field table="ChildSessions" field="ChildID"/>
+    </link>
+    <link>
+      <table-field table="Sessions" field="Date"/>
+      <table-field table="ChildSessions" field="Date"/>
+    </link>
+    <custom>
+      (ChildSessions.MorningSession = TRUE AND Sessions.SessionType = 'M')
+      OR
+      (ChildSessions.AfternoonSession = TRUE AND Sessions.SessionType = 'A')
+    </custom>
+  </constraints>
+</input-box>

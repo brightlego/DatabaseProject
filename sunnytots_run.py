@@ -1,10 +1,10 @@
-import gui.master
-import backend.master
+import gui
+import backend
 
 
 def main():
-    backend_master = backend.master.Backend()
-    gui_master = gui.master.Gui(backend_master)
+    backend_master = backend.Backend()
+    gui_master = gui.Gui(backend_master)
     gui_master.mainloop()
 
 

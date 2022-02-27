@@ -8,6 +8,7 @@ import gui.input.input_field
 import gui.tabbar
 import gui.input.input_xml_cache
 import gui.undo
+import gui.output
 
 
 class Gui(gui.templates.Page):
@@ -26,6 +27,8 @@ class Gui(gui.templates.Page):
         )
         self.__input_is_empty = True
 
+        self.__output = gui.output.OutputBox(self)
+
         self.__undo_buton = gui.undo.UndoButton(self)
 
         ttk.Separator(self, orient=tk.HORIZONTAL).grid(
@@ -34,12 +37,16 @@ class Gui(gui.templates.Page):
         ttk.Separator(self, orient=tk.HORIZONTAL).grid(
             column=0, row=4, columnspan=100, sticky=tk.EW
         )
+        ttk.Separator(self, orient=tk.HORIZONTAL).grid(
+            column=0, row=6, columnspan=100, sticky=tk.EW
+        )
 
         self.__tabbar.grid(column=0, row=0, sticky=tk.W)
         self.__tabs.grid(column=0, row=1, pady=5, sticky=tk.W)
         self.__input.grid(column=0, row=3)
         self.__input.grid_remove()
         self.__undo_buton.grid(column=0, row=5, sticky=tk.W)
+        self.__output.grid(column=0, row=7)
 
         self.change_tab()
         self.pack(expand=True, fill=tk.BOTH)
@@ -60,8 +67,12 @@ class Gui(gui.templates.Page):
         return self.__backend.gen_new_query(type_)
 
     def submit_query(self, query):
-        print(query.generate_query())
-        # self.__backend.handle_query(query)
+        fields = query.get_fields()
+        data = self.__backend.handle_query(query)
+        if fields:
+            self.__output.reset()
+            self.__output.set_headers(fields)
+            self.__output.set_data(data)
 
     def commit(self):
         self.__backend.commit()

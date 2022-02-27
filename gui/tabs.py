@@ -65,7 +65,6 @@ class TabButton(tk.Radiobutton):
         self.__text = text
         self.__parent = parent
         self.__variable = self.__parent.get_variable()
-        print(self.__variable)
         super().__init__(
             parent,
             *args,
