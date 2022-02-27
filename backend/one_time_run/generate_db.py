@@ -1,7 +1,9 @@
 import sqlite3
 import os
 
-DB_NAME = os.path.join("..","sunnytots.db")
+DIR = os.path.split(os.path.realpath(__file__))[0]
+
+DB_NAME = os.path.join(DIR, "..", "sunnytots.db")
 SQL_STATEMENTS = "SQLstatements.sql"
 
 connection = sqlite3.connect(DB_NAME)

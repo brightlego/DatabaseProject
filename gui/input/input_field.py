@@ -4,6 +4,7 @@ import gui.templates
 
 class InputField(gui.templates.Page):
     def _init_elements(self):
+
         self.__searchdata = SearchData(self)
         self.__setdata = SetData(self)
         self.__optionalbox = OptionalBox(self.__searchdata)
@@ -12,11 +13,13 @@ class InputField(gui.templates.Page):
         self.__query = None
         self.__submit_button = SubmitButton(self)
 
-        self.__title.pack()
-        self.__searchdata.pack(expand=True, fill=tk.BOTH, pady=10)
-        self.__setdata.pack(expand=True, fill=tk.BOTH, pady=10)
-        self.__submit_button.pack(anchor=tk.SE)
-        self.__optionalbox.grid(column=1, columnspan=100, row=100, pady=10)
+        self.__title.grid(column=0, row=0)
+        self.__searchdata.grid(column=0, columnspan=3, row=1, pady=5)
+        self.__setdata.grid(column=0, columnspan=3, row=2, pady=5)
+        self.__submit_button.grid(column=2, row=3)
+        self.__optionalbox.grid(column=1, columnspan=100, row=100, pady=2)
+
+        self.__check_empty_widgets()
 
     def set_template(self, template):
         for item in self.__elements:
@@ -29,6 +32,25 @@ class InputField(gui.templates.Page):
                 self.__set_data(self.__searchdata, item)
             elif item.tag == "set-data":
                 self.__set_data(self.__setdata, item)
+
+        self.__check_empty_widgets()
+
+    def __check_empty_widgets(self):
+        print(self.__searchdata.winfo_children())
+        if len(self.__searchdata.winfo_children()) <= 1:
+            self.__searchdata.grid_remove()
+        else:
+            self.__searchdata.grid()
+
+        if len(self.__setdata.winfo_children()) == 0:
+            self.__setdata.grid_remove()
+        else:
+            self.__setdata.grid()
+
+        if len(self.__optionalbox.winfo_children()) == 0:
+            self.__optionalbox.grid_remove()
+        else:
+            self.__optionalbox.grid()
 
     def __set_data(self, parent, root):
         row = 1
@@ -61,7 +83,7 @@ class SetData(gui.templates.HollowPage):
 
 class OptionalBox(gui.templates.HollowPage):
     def _init_elements(self):
-        self.__label = tk.Label(self)
+        self.__label = tk.Label(self, text="Optional:")
         self.__label.grid(column=0, columnspan=10, row=0)
 
 
@@ -98,9 +120,9 @@ class Entry:
             )
 
 
-class SubmitButton(gui.templates.Page):
-    def _init_elements(self):
-        self.__button = tk.Button(
-            self, text="submit", command=lambda: self._parent.submit_query()
-        )
-        self.__button.pack()
+class SubmitButton(gui.templates.Button):
+    def _get_text(self):
+        return "Submit"
+
+    def _command(self):
+        self._parent.submit_query()

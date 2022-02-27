@@ -27,3 +27,26 @@ class HideablePage(Page):
 
     def hide(self):
         self.grid_remove()
+
+
+class Button(tk.Button):
+    def __init__(self, parent, *args, parent_kwargs=None, **kwargs):
+        self._parent = parent
+        if parent_kwargs is None:
+            parent_kwargs = {}
+        super().__init__(
+            parent, text=self._get_text(), command=self._command, **parent_kwargs,
+        )
+        self._init_elements(*args, **kwargs)
+
+    def _init_elements(self, *args, **kwargs):
+        pass
+
+    def _get_text(self):
+        pass
+
+    def _command(self):
+        pass
+
+    def __getattr__(self, name):
+        return self.__getattribute__(name)

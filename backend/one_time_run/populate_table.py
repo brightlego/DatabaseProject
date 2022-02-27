@@ -4,10 +4,12 @@ from datetime import date, timedelta
 import random
 import os
 
-DB_NAME = os.path.join("..","sunnytots.db")
+DIR = os.path.split(os.path.realpath(__file__))[0]
 
-CAREGIVER_CSV = os.path.join("mock_data","caregivers.csv")
-CHILDNAMES_CSV = os.path.join("mock_data","childnames.csv")
+DB_NAME = os.path.join(DIR, "..", "sunnytots.db")
+
+CAREGIVER_CSV = os.path.join("mock_data", "caregivers.csv")
+CHILDNAMES_CSV = os.path.join("mock_data", "childnames.csv")
 
 CAREGIVER_INSERT_SQL = """
 INSERT INTO Caregivers(
@@ -126,11 +128,15 @@ def populate_sessions(connection):
 
 
 def link_child_session(connection):
-    print('')
+    print("")
     errors = {}
     for day in days_in_year(YEAR, restrictions=True):
-        morning_children = connection.execute(GET_N_CHILDREN_SQL,[random.randint(1,20)]).fetchall()
-        afternoon_children = connection.execute(GET_N_CHILDREN_SQL,[random.randint(1,20)]).fetchall()
+        morning_children = connection.execute(
+            GET_N_CHILDREN_SQL, [random.randint(1, 20)]
+        ).fetchall()
+        afternoon_children = connection.execute(
+            GET_N_CHILDREN_SQL, [random.randint(1, 20)]
+        ).fetchall()
 
         datestr = day.isoformat()
 
@@ -145,7 +151,7 @@ def link_child_session(connection):
                             True,
                             True,
                             random.choice([True, False]),
-                            random.choice([True, False])
+                            random.choice([True, False]),
                         ],
                     )
                 else:
@@ -157,7 +163,7 @@ def link_child_session(connection):
                             True,
                             False,
                             random.choice([True, False]),
-                            False
+                            False,
                         ],
                     )
 
@@ -173,7 +179,7 @@ def link_child_session(connection):
                             False,
                             True,
                             False,
-                            random.choice([True, False])
+                            random.choice([True, False]),
                         ],
                     )
         except sqlite3.IntegrityError as err:

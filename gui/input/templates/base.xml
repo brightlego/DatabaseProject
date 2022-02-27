@@ -1,0 +1,14 @@
+<input-box title="" type="">
+  <search-data>
+    <entry label="" table="" field=""/>
+
+    <optional>
+
+    </optional>
+  </search-data>
+
+
+  <set-data>
+
+  </set-data>
+</input-box>

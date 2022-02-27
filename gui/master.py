@@ -6,6 +6,7 @@ import gui.tabs
 import gui.input.input_field
 import gui.tabbar
 import gui.input.input_xml_cache
+import gui.undo
 
 
 class Gui(gui.templates.Page):
@@ -22,14 +23,22 @@ class Gui(gui.templates.Page):
         self.__input = gui.input.input_field.InputField(
             self, parent_kwargs={"relief": tk.GROOVE}
         )
+        self.__input_is_empty = True
+
+        self.__undo_buton = gui.undo.UndoButton(self)
 
         ttk.Separator(self, orient=tk.HORIZONTAL).grid(
             column=0, row=2, columnspan=100, sticky="ew"
+        )
+        ttk.Separator(self, orient=tk.HORIZONTAL).grid(
+            column=0, row=4, columnspan=100, sticky="ew"
         )
 
         self.__tabbar.grid(column=0, row=0)
         self.__tabs.grid(column=0, row=1)
         self.__input.grid(column=0, row=3)
+        self.__input.grid_remove()
+        self.__undo_buton.grid(column=0, row=5, sticky=tk.W)
 
         self.change_tab()
         self.pack(expand=True, fill=tk.BOTH)
@@ -41,6 +50,9 @@ class Gui(gui.templates.Page):
         self.__tabs.change_tab(tab)
 
     def change_input(self, template):
+        if self.__input_is_empty:
+            self.__input.grid()
+        self.__input_is_empty = False
         self.__input.set_template(template)
 
     def gen_new_query(self, type_):
@@ -48,10 +60,10 @@ class Gui(gui.templates.Page):
 
     def submit_query(self, query):
         print(query.generate_query())
-        # self.__backend.handle_query(self.__input.get_query())
+        # self.__backend.handle_query(query)
 
     def destroy(self):
-        self.__backend.commit()
+        self.__backend.rollback()
         super().destroy()
 
     def undo(self):
