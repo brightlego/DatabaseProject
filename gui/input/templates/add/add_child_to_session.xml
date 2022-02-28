@@ -1,0 +1,14 @@
+<input-box title="Add Child to Session" type="add">
+  <search-data>
+    <entry label="Child Name" table="Children" field="Name"/>
+    <date label="Session" table="Session" field="Session"/>
+    <optional>
+      <entry label="Caregiver Name" table="Caregiver" field="Name">
+    </optional>
+  </search-data>
+
+  <set-data>
+  </set-data>
+  <constraints>
+  </constraints>
+</input-box>

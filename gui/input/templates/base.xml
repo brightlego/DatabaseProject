@@ -3,12 +3,14 @@
     <entry label="" table="" field=""/>
 
     <optional>
-
     </optional>
   </search-data>
 
 
   <set-data>
-
   </set-data>
+
+
+  <constraints>
+  </constraints>
 </input-box>

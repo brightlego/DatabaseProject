@@ -8,8 +8,8 @@ DIR = os.path.split(os.path.realpath(__file__))[0]
 
 DB_NAME = os.path.join(DIR, "..", "sunnytots.db")
 
-CAREGIVER_CSV = os.path.join("mock_data", "caregivers.csv")
-CHILDNAMES_CSV = os.path.join("mock_data", "childnames.csv")
+CAREGIVER_CSV = os.path.join(DIR, "mock_data", "caregivers.csv")
+CHILDNAMES_CSV = os.path.join(DIR, "mock_data", "childnames.csv")
 
 CAREGIVER_INSERT_SQL = """
 INSERT INTO Caregivers(
@@ -196,12 +196,17 @@ def link_child_session(connection):
             print(f"{errstr} x{errors[errstr]}")
 
 
-connection = sqlite3.connect(DB_NAME)
+def main():
+    connection = sqlite3.connect(DB_NAME)
 
-populate_caregivers(connection)
-populate_children(connection)
-populate_sessions(connection)
-link_child_session(connection)
+    populate_caregivers(connection)
+    populate_children(connection)
+    populate_sessions(connection)
+    link_child_session(connection)
 
-connection.commit()
-connection.close()
+    connection.commit()
+    connection.close()
+
+
+if __name__ == "__main__":
+    main()

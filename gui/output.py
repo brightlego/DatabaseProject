@@ -46,6 +46,5 @@ class OutputBox(gui.templates.HideablePage):
     def reset(self):
         for element in self.__elements:
             element.destroy()
-        print("Reset!")
         while self.__elements:
             del self.__elements[0]

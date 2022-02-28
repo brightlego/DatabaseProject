@@ -26,8 +26,10 @@ class InputField(gui.templates.Page):
     def set_template(self, template):
         for item in self.__elements:
             item.destroy()
+        self.__elements = []
         root = template.getroot()
         self.__title["text"] = root.attrib["title"]
+        del self.__query
         self.__query = self._parent.gen_new_query(root.attrib["type"])
         for item in root:
             if item.tag == "search-data":

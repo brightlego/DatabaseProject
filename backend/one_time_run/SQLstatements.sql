@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS ChildSessions;
 
 CREATE TABLE Caregivers
 (
-    CaregiverID INTEGER PRIMARY KEY NOT NULL,
+    CaregiverID INTEGER PRIMARY KEY AUTOINCREMENT,
     PhysicalAddress TEXT NOT NULL,
     ContactNumber VARCHAR(20) NOT NULL,
     EmailAddress  TEXT NOT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE Caregivers
 
 CREATE TABLE Children
 (
-    ChildID INTEGER PRIMARY KEY NOT NULL,
+    ChildID INTEGER PRIMARY KEY AUTOINCREMENT,
     ChildName TEXT NOT NULL,
     CaregiverID INTEGER NOT NULL,
     FOREIGN KEY (CaregiverID) REFERENCES Caregivers(CaregiverID)
@@ -36,7 +36,7 @@ CREATE TABLE ChildSessions
 
     ChildID INTEGER NOT NULL,
     Date CHAR(10) NOT NULL, --yyyy-mm-dd
- 
+
     FOREIGN KEY (ChildID) REFERENCES Children(ChildID),
     FOREIGN KEY (Date) REFERENCES Sessions(Date),
     PRIMARY KEY (Date, ChildID)

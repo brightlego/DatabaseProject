@@ -114,6 +114,9 @@ class AddQuery(Query):
 
 
 class GetQuery(Query):
+    def __init__(self, order_by=None, order_asc=True, limit=1000):
+        super().__init__(order_by=order_by, order_asc=order_asc, limit=limit)
+
     def _gen_antiquery(self):
         self._antiquery = AntiGetQuery()
 
