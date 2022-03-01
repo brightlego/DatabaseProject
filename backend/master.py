@@ -17,7 +17,12 @@ class Backend:
     def handle_query(self, query):
         self.__history.append(copy.deepcopy(query))
         qtext, param = query.generate_query()
-        result = self.__connection.execute(qtext, param)
+        print(qtext, param)
+        try:
+            result = self.__connection.execute(qtext, param)
+        except sqlite3.Error:
+            print(qtext, param)
+            raise
         return result
 
     def commit(self):

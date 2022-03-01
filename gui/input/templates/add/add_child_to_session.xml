@@ -3,7 +3,7 @@
     <entry label="Child Name" table="Children" field="Name"/>
     <date label="Session" table="Session" field="Session"/>
     <optional>
-      <entry label="Caregiver Name" table="Caregiver" field="Name">
+      <entry label="Caregiver Name" table="Caregiver" field="Name"/>
     </optional>
   </search-data>
 

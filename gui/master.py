@@ -49,6 +49,7 @@ class Gui(gui.templates.Page):
         self.__output.grid(column=0, row=7)
 
         self.change_tab()
+        self.config(relief="ridge")
         self.pack(expand=True, fill=tk.BOTH)
 
     def get_xml_cache(self):

@@ -1,0 +1,27 @@
+<input-box title="Get Sessions A Child Attends" type="get">
+  <search-data>
+    <entry label="Child Name" table="Children" field="ChildName"/>
+
+    <optional>
+        <entry label="Child ID" table="Children" field="ChildID"/>
+    </optional>
+  </search-data>
+
+
+  <set-data>
+  </set-data>
+
+
+  <constraints>
+    <get-data table="ChildSessions" field="Date"/>
+    <get-data table="ChildSessions" field="MorningSession"/>
+    <get-data table="ChildSessions" field="AfternoonSession"/>
+    <get-data table="ChildSessions" field="MorningBooked"/>
+    <get-data table="ChildSessions" field="AfternoonBooked"/>
+
+    <link>
+        <table-field table="Children" field="ChildID"/>
+        <table-field table="ChildSessions" field="ChildID"/>
+    </link>
+  </constraints>
+</input-box>

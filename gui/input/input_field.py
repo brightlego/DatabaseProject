@@ -23,6 +23,8 @@ class InputField(gui.templates.Page):
 
         self.__check_empty_widgets()
 
+        print(self.__optionalbox)
+
     def set_template(self, template):
         for item in self.__elements:
             item.destroy()
@@ -134,7 +136,7 @@ class Input:
         self._entry.destroy()
 
     def get(self):
-        self._entryvar.get()
+        return self._entryvar.get()
 
     def set_query(self):
         if not self._validate():
@@ -145,6 +147,13 @@ class Input:
         query = self._parent.get_query()
         if self._type == "search-data":
             query.update_constraint(
+                self._item.attrib["field"], self._item.attrib["table"], self.get(),
+            )
+        elif self._type == "optional":
+            if self.get() == "":
+                return
+            else:
+                query.update_constraint(
                 self._item.attrib["field"], self._item.attrib["table"], self.get(),
             )
         else:

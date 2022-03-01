@@ -72,7 +72,7 @@ class Query:
         query += f" LIMIT {self._limit}"
         return query
 
-    def _get_fields(self):
+    def get_fields(self):
         return None
 
 
