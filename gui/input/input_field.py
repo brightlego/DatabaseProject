@@ -18,7 +18,7 @@ class InputField(gui.templates.Page):
         self.__title.grid(column=0, row=0)
         self.__searchdata.grid(column=0, columnspan=3, row=1, pady=5)
         self.__setdata.grid(column=0, columnspan=3, row=2, pady=5)
-        self.__submit_button.grid(column=2, row=3)
+        self.__submit_button.grid(column=1000, row=3)
         self.__optionalbox.grid(column=1, columnspan=100, row=100, pady=2)
 
         self.__check_empty_widgets()
@@ -35,61 +35,76 @@ class InputField(gui.templates.Page):
         self.__query = self._parent.gen_new_query(root.attrib["type"])
         for item in root:
             if item.tag == "search-data":
-                self.__set_data(self.__searchdata, item)
+                self.__set_data(self.__searchdata, item, item.tag)
             elif item.tag == "set-data":
-                self.__set_data(self.__setdata, item)
+                self.__set_data(self.__setdata, item, item.tag)
             elif item.tag == "constraints":
-                self.__set_data(self, item)
+                self.__set_data(self, item, item.tag)
 
         self.__check_empty_widgets()
 
     def __check_empty_widgets(self):
-        if len(self.__searchdata.winfo_children()) <= 1:
+        if self.__searchdata.is_empty():
             self.__searchdata.hide()
         else:
             self.__searchdata.show()
 
-        if len(self.__setdata.winfo_children()) == 0:
+        if self.__setdata.is_empty():
             self.__setdata.hide()
         else:
             self.__setdata.show()
 
-        if len(self.__optionalbox.winfo_children()) <= 1:
+        if self.__optionalbox.is_empty():
             self.__optionalbox.hide()
         else:
             self.__optionalbox.show()
 
-    def __set_data(self, parent, root, mode="vertical"):
-        row = 1
+    def __set_data(self, parent, root, tag, mode="vertical", row=1):
+        row = row
+        column = 0
         for item in root:
             if item.tag == "horizontal":
-                self.__set_data(parent, item)
+                self.__elements.append(Label(parent, item, row, column, tag))
+                self.__set_data(parent, item, tag, mode="horizontal", row=row)
             elif item.tag == "optional":
-                self.__set_data(self.__optionalbox, item)
+                self.__set_data(self.__optionalbox, item, item.tag)
             else:
-                self.__add_item(parent, item, row, root, mode)
-            row += 1
+                self.__add_item(parent, item, row, column, root, tag)
+            if mode == "vertical":
+                row += 1
+            else:
+                column += 10
 
     def get_query(self):
         return self.__query
 
-    def __add_item(self, parent, item, row, root, mode):
+    def __add_item(self, parent, item, row, column, root, tag=None):
+        if tag is None:
+            tag = root.tag
         if item.tag == "entry":
-            self.__elements.append(Entry(parent, item, row, root.tag))
+            self.__elements.append(Entry(parent, item, row, column, tag))
         elif item.tag == "phone":
-            self.__elements.append(PhoneNum(parent, item, row, root.tag))
+            self.__elements.append(PhoneNum(parent, item, row, column, tag))
         elif item.tag == "email":
-            self.__elements.append(Email(parent, item, row, root.tag))
+            self.__elements.append(Email(parent, item, row, column, tag))
         elif item.tag == "radio":
-            self.__elements.append(Radio(parent, item, row, root.tag))
+            self.__elements.append(Radio(parent, item, row, column, tag))
         elif item.tag == "date":
-            self.__elements.append(Date(parent, item, row, root.tag))
+            self.__elements.append(Date(parent, item, row, column, tag))
         elif item.tag == "link":
-            self.__elements.append(Link(parent, item, row, root.tag))
+            self.__elements.append(Link(parent, item, row, column, tag))
         elif item.tag == "get-data":
-            self.__elements.append(Data(parent, item, row, root.tag))
-        elif item.tag == "custom":
-            self.__elements.append(Custom(parent, item, row, root.tag))
+            self.__elements.append(Data(parent, item, row, column, tag))
+        elif item.tag == "checkbox":
+            self.__elements.append(Checkbox(parent, item, row, column, tag))
+        elif item.tag == "number":
+            self.__elements.append(Number(parent, item, row, column, tag))
+        elif item.tag == "custom-constraint":
+            self.__elements.append(
+                CustomConstraint(parent, item, row, column, root.tag)
+            )
+        elif item.tag == "custom-select":
+            self.__elements.append(CustomSelect(parent, item, row, column, root.tag))
 
     def set_query(self):
         for element in self.__elements:
@@ -107,25 +122,35 @@ class InputField(gui.templates.Page):
 
 
 class SearchData(gui.templates.HollowPage, gui.templates.HideablePage):
-    pass
+    def is_empty(self):
+        if len(self.winfo_children()) == 1 and isinstance(
+            self.winfo_children()[0], OptionalBox
+        ):
+            return self.winfo_children()[0].is_empty()
+        return len(self.winfo_children()) <= 1
 
 
 class SetData(gui.templates.HollowPage, gui.templates.HideablePage):
-    pass
+    def is_empty(self):
+        return len(self.winfo_children()) <= 0
 
 
-class OptionalBox(gui.templates.HollowPage):
+class OptionalBox(gui.templates.HollowPage, gui.templates.HideablePage):
     def _init_elements(self):
         self.__label = tk.Label(self, text="Optional:")
         self.__label.grid(column=0, columnspan=10, row=0)
 
+    def is_empty(self):
+        return len(self.winfo_children()) <= 1
+
 
 class Input:
-    def __init__(self, parent, item, row, type_):
+    def __init__(self, parent, item, row, column, type_):
         self._parent = parent
         self._item = item
         self._type = type_
         self._row = row
+        self._column = column
         self._init_elements()
 
     def _init_elements(self):
@@ -134,8 +159,8 @@ class Input:
         self._entryvar = tk.StringVar()
         self._entry = tk.Entry(self._parent, textvariable=self._entryvar)
 
-        self._label.grid(column=1, row=self._row, sticky=tk.E)
-        self._entry.grid(column=2, row=self._row)
+        self._label.grid(column=self._column + 1, row=self._row, sticky=tk.E)
+        self._entry.grid(column=self._column + 2, row=self._row)
 
     def destroy(self):
         self._label.destroy()
@@ -151,6 +176,8 @@ class Input:
         else:
             self._label.config(fg="#000")
         query = self._parent.get_query()
+        if self.get() is None:
+            return
         if self._type == "search-data":
             query.update_constraint(
                 self._item.attrib["field"], self._item.attrib["table"], self.get(),
@@ -176,6 +203,20 @@ class Entry(Input):
     pass
 
 
+class Label(Input):
+    def _init_elements(self):
+        attrib = self._item.attrib
+        self._label = tk.Label(self._parent, text=attrib["label"])
+
+        self._label.grid(column=self._column + 1, row=self._row, sticky=tk.E)
+
+    def get(self):
+        return
+
+    def destroy(self):
+        self._label.destroy()
+
+
 class PhoneNum(Input):
     def _validate(self):
         text = self._entryvar.get()
@@ -191,14 +232,19 @@ class PhoneNum(Input):
         if re.match(r"^\+?((\(?\d+\)?)?(-|\s+)?)+$", text):
             return True
         else:
-            return super()._validate()
+            return text == ""
 
 
 class Email(Input):
     def _validate(self):
         # The only way to validate an email without sending a confirmation
         # message or excluding valid emails.
-        return "@" in self._entryvar.get()
+        return "@" in self._entryvar.get() or self._entryvar.get() == ""
+
+
+class Number(Input):
+    def _validate(self):
+        return self._entryvar.get().isnumeric() or self._entryvar.get() == ""
 
 
 class Radio(Input):
@@ -206,7 +252,7 @@ class Radio(Input):
         attrib = self._item.attrib
         self._label = tk.Label(self._parent, text=attrib["label"])
         self._entryvar = tk.StringVar()
-        self._label.grid(row=self._row, column=0)
+        self._label.grid(row=self._row, column=self._column)
         column = 1
         self._radios = []
         for item in self._item:
@@ -214,7 +260,7 @@ class Radio(Input):
             radio = tk.Radiobutton(
                 self._parent, text=item.text, variable=self._entryvar, value=value,
             )
-            radio.grid(row=self._row, column=column)
+            radio.grid(row=self._row, column=self._column + column)
             self._radios.append(radio)
             column += 1
 
@@ -242,7 +288,7 @@ class Date(Input):
     def _init_elements(self):
         attrib = self._item.attrib
         self._label = tk.Label(self._parent, text=attrib["label"])
-        self._label.grid(row=self._row, column=0)
+        self._label.grid(row=self._row, column=self._column + 1)
         self._entryvar = tk.StringVar()
         self._calendar = tkcalendar.Calendar(
             self._parent,
@@ -252,7 +298,7 @@ class Date(Input):
             date_pattern="y-mm-dd",
             variable=self._entryvar,
         )
-        self._calendar.grid(row=self._row, column=1, pady=10, padx=10)
+        self._calendar.grid(row=self._row, column=self._column + 2, pady=10, padx=10)
 
     def get(self):
         return self._calendar.get_date()
@@ -262,13 +308,59 @@ class Date(Input):
         self._calendar.destroy()
 
 
-class Custom(Input):
+class Checkbox(Input):
+    def _init_elements(self):
+        attrib = self._item.attrib
+        self._entryvar = tk.IntVar()
+        self._label = tk.Label()
+        self._entry = tk.Checkbutton(
+            self._parent, text=attrib["label"], variable=self._entryvar
+        )
+
+        self._entry.grid(column=self._column + 2, row=self._row)
+
+    def destroy(self):
+        self._entry.destroy()
+
+    def get(self):
+        is_checked = bool(self._entryvar.get())
+        if is_checked:
+            value = self._item.attrib["tickedvalue"]
+        else:
+            value = self._item.attrib["defaultvalue"]
+        dtype = self._item.attrib["dtype"]
+        if dtype == "int":
+            try:
+                value = int(value)
+            except ValueError:
+                value = 0
+        elif dtype == "bool":
+            value = value == "True"
+        elif dtype == "float":
+            value = float(value)
+
+        return value
+
+
+class CustomConstraint(Input):
     def _init_elements(self):
         return
 
     def set_query(self):
         query = self._parent.get_query()
         query.add_custom_constraint(self._item.text)
+
+    def destroy(self):
+        return
+
+
+class CustomSelect(Input):
+    def _init_elements(self):
+        return
+
+    def set_query(self):
+        query = self._parent.get_query()
+        query.add_custom_select(self._item.text)
 
     def destroy(self):
         return

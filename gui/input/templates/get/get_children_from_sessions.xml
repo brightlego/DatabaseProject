@@ -17,7 +17,7 @@
   <constraints>
     <get-data table="Children" field="ChildName"/>
     <get-data table="Children" field="ChildID"/>
-    
+
     <link>
       <table-field table="Children" field="ChildID"/>
       <table-field table="ChildSessions" field="ChildID"/>
@@ -26,10 +26,10 @@
       <table-field table="Sessions" field="Date"/>
       <table-field table="ChildSessions" field="Date"/>
     </link>
-    <custom>
+    <custom-constraint>
       (ChildSessions.MorningSession = 1 AND Sessions.SessionType = 'M')
       OR
       (ChildSessions.AfternoonSession = 1 AND Sessions.SessionType = 'A')
-    </custom>
+    </custom-constraint>
   </constraints>
 </input-box>

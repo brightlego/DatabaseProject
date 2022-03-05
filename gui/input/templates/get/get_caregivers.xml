@@ -1,0 +1,25 @@
+<input-box title="Get Caregivers" type="get">
+  <search-data>
+
+    <optional>
+      <entry label="Name" table="Caregivers" field="Name"/>
+      <entry label="Address" table="Caregivers" field="PhysicalAddress"/>
+      <email label="Email" table="Caregivers" field="EmailAddress"/>
+      <phone label="Phone Number" table="Caregivers" field="ContactNumber"/>
+      <number label="Caregiver ID" table="Caregivers" field="CaregiverID"/>
+    </optional>
+  </search-data>
+
+
+  <set-data>
+  </set-data>
+
+
+  <constraints>
+    <get-data table="Caregivers" field="CaregiverID"/>
+    <get-data table="Caregivers" field="Name"/>
+    <get-data table="Caregivers" field="PhysicalAddress"/>
+    <get-data table="Caregivers" field="EmailAddress"/>
+    <get-data table="Caregivers" field="ContactNumber"/>
+  </constraints>
+</input-box>

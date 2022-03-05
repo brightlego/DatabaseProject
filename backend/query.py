@@ -1,4 +1,7 @@
+import copy
+
 from backend.sqlescape import escape
+
 
 class Query:
     def __init__(self, order_by=None, order_asc=True, limit=1):
@@ -7,6 +10,7 @@ class Query:
         self._data = {}
         self._constraints = {}
         self._custom_constraints = []
+        self._custom_select = []
         self._links = {}
         self._order_by = order_by
         self._order_asc = order_asc
@@ -14,10 +18,12 @@ class Query:
         self._gen_antiquery()
 
     def update_constraint(self, field, table, value):
+        self._antiquery.update_constraint(field, table, value)
         self._constraints[f"{escape(table)}.{escape(field)}"] = value
         self._tables.add(table)
 
     def add_link(self, field1, field2, table1, table2):
+        self._antiquery.add_link(field1, field2, table1, table2)
         self._links[
             f"{escape(table1)}.{escape(field1)}"
         ] = f"{escape(table2)}.{escape(field2)}"
@@ -25,9 +31,15 @@ class Query:
         self._tables.add(table2)
 
     def add_custom_constraint(self, constraint):
+        self._antiquery.add_custom_constraint(constraint)
         self._custom_constraints.append(constraint)
 
+    def add_custom_select(self, field, get_text):
+        self._custom_select.append((field, get_text))
+
     def update_data(self, field, table, value=None):
+        self._antiquery.update_data(field, table)
+        self._antiquery.update_constraint(field, table, value)
 
         if value is None:
             if table in self._fields:
@@ -82,6 +94,21 @@ class Query:
 
 
 class NullQuery(Query):
+    def update_constraint(self, field, table, value):
+        pass
+
+    def add_link(self, field1, field2, table1, table2):
+        pass
+
+    def add_custom_constraint(self, constraint):
+        pass
+
+    def add_custom_select(self, field, get_text):
+        pass
+
+    def update_data(self, field, table, value=None):
+        pass
+
     def _gen_antiquery(self):
         self._antiquery = self
 
@@ -114,7 +141,6 @@ class AddQuery(Query):
         for field in self._data:
             params.append(self._data[field])
 
-        text = self._finalise_query(text)
         return text, params
 
 
@@ -126,13 +152,21 @@ class GetQuery(Query):
         self._antiquery = AntiGetQuery()
 
     def get_fields(self):
-        return self._fields
+        fields = copy.deepcopy(self._fields)
+        fields[" "] = []
+        for field, _ in self._custom_select:
+            fields[" "].append(field)
+        return fields
 
     def _gen_data_query(self):
         fields = []
         for table in self._fields:
             for field in self._fields[table]:
                 fields.append(f"{escape(table)}.{escape(field)}")
+
+        for _, get_text in self._custom_select:
+            fields.append(get_text)
+
         fields = ",".join(fields)
         return fields
 
@@ -205,7 +239,7 @@ class ChangeQuery(Query):
 
 class AntiQuery(Query):
     def _gen_antiquery(self):
-        pass
+        self._antiquery = NullQuery()
 
     def _execute(self, conn):
         pass

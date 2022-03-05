@@ -8,12 +8,12 @@
     <entry label="ChildID" table="ChildSessions" field="ChildID"/>
     <date label="Session Date" table="ChildSessions" field="Date"/>
     <horizontal label="Session Type">
-      <checkbox tickedvalue="1" defaultvalue="0" dtype="int">Morning</element>
-      <checkbox tickedvalue="1" defaultvalue="0" dtype="int">Afternoon</element>
+      <checkbox tickedvalue="1" defaultvalue="0" dtype="int" label="Morning" table="ChildSessions" field="MorningSession"/>
+      <checkbox tickedvalue="1" defaultvalue="0" dtype="int" label="Afternoon" table="ChildSessions" field="AfternoonSession"/>
     </horizontal>
     <horizontal label="Booked sessions">
-      <checkbox tickedvalue="1" defaultvalue="0" dtype="int">Morning</element>
-      <checkbox tickedvalue="1" defaultvalue="0" dtype="int">Afternoon</element>
+      <checkbox tickedvalue="1" defaultvalue="0" dtype="int" label="Morning" table="ChildSessions" field="MorningBooked"/>
+      <checkbox tickedvalue="1" defaultvalue="0" dtype="int" label="Afternoon" table="ChildSessions" field="AfternoonBooked"/>
     </horizontal>
 
   </set-data>

@@ -11,6 +11,7 @@ def install(package):
     """Installs a package through pip"""
     subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
+
 # The dependancies
 install("tkcalendar")
 
