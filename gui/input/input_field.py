@@ -45,45 +45,51 @@ class InputField(gui.templates.Page):
 
     def __check_empty_widgets(self):
         if len(self.__searchdata.winfo_children()) <= 1:
-            self.__searchdata.grid_remove()
+            self.__searchdata.hide()
         else:
-            self.__searchdata.grid()
+            self.__searchdata.show()
 
         if len(self.__setdata.winfo_children()) == 0:
-            self.__setdata.grid_remove()
+            self.__setdata.hide()
         else:
-            self.__setdata.grid()
+            self.__setdata.show()
 
         if len(self.__optionalbox.winfo_children()) <= 1:
-            self.__optionalbox.grid_remove()
+            self.__optionalbox.hide()
         else:
-            self.__optionalbox.grid()
+            self.__optionalbox.show()
 
-    def __set_data(self, parent, root):
+    def __set_data(self, parent, root, mode="vertical"):
         row = 1
         for item in root:
-            if item.tag == "entry":
-                self.__elements.append(Entry(parent, item, row, root.tag))
-            elif item.tag == "phone":
-                self.__elements.append(PhoneNum(parent, item, row, root.tag))
-            elif item.tag == "email":
-                self.__elements.append(Email(parent, item, row, root.tag))
-            elif item.tag == "radio":
-                self.__elements.append(Radio(parent, item, row, root.tag))
-            elif item.tag == "date":
-                self.__elements.append(Date(parent, item, row, root.tag))
-            elif item.tag == "link":
-                self.__elements.append(Link(parent, item, row, root.tag))
-            elif item.tag == "get-data":
-                self.__elements.append(Data(parent, item, row, root.tag))
-            elif item.tag == "custom":
-                self.__elements.append(Custom(parent, item, row, root.tag))
+            if item.tag == "horizontal":
+                self.__set_data(parent, item)
             elif item.tag == "optional":
                 self.__set_data(self.__optionalbox, item)
+            else:
+                self.__add_item(parent, item, row, root, mode)
             row += 1
 
     def get_query(self):
         return self.__query
+
+    def __add_item(self, parent, item, row, root, mode):
+        if item.tag == "entry":
+            self.__elements.append(Entry(parent, item, row, root.tag))
+        elif item.tag == "phone":
+            self.__elements.append(PhoneNum(parent, item, row, root.tag))
+        elif item.tag == "email":
+            self.__elements.append(Email(parent, item, row, root.tag))
+        elif item.tag == "radio":
+            self.__elements.append(Radio(parent, item, row, root.tag))
+        elif item.tag == "date":
+            self.__elements.append(Date(parent, item, row, root.tag))
+        elif item.tag == "link":
+            self.__elements.append(Link(parent, item, row, root.tag))
+        elif item.tag == "get-data":
+            self.__elements.append(Data(parent, item, row, root.tag))
+        elif item.tag == "custom":
+            self.__elements.append(Custom(parent, item, row, root.tag))
 
     def set_query(self):
         for element in self.__elements:
@@ -100,11 +106,11 @@ class InputField(gui.templates.Page):
         self.__query = type(self.__query)()
 
 
-class SearchData(gui.templates.HollowPage):
+class SearchData(gui.templates.HollowPage, gui.templates.HideablePage):
     pass
 
 
-class SetData(gui.templates.HollowPage):
+class SetData(gui.templates.HollowPage, gui.templates.HideablePage):
     pass
 
 
@@ -154,8 +160,8 @@ class Input:
                 return
             else:
                 query.update_constraint(
-                self._item.attrib["field"], self._item.attrib["table"], self.get(),
-            )
+                    self._item.attrib["field"], self._item.attrib["table"], self.get(),
+                )
         else:
             query.update_data(
                 self._item.attrib["field"], self._item.attrib["table"], self.get(),

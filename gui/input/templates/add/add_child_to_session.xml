@@ -1,13 +1,21 @@
 <input-box title="Add Child to Session" type="add">
   <search-data>
-    <entry label="Child Name" table="Children" field="Name"/>
-    <date label="Session" table="Session" field="Session"/>
     <optional>
-      <entry label="Caregiver Name" table="Caregiver" field="Name"/>
     </optional>
   </search-data>
 
   <set-data>
+    <entry label="ChildID" table="ChildSessions" field="ChildID"/>
+    <date label="Session Date" table="ChildSessions" field="Date"/>
+    <horizontal label="Session Type">
+      <checkbox tickedvalue="1" defaultvalue="0" dtype="int">Morning</element>
+      <checkbox tickedvalue="1" defaultvalue="0" dtype="int">Afternoon</element>
+    </horizontal>
+    <horizontal label="Booked sessions">
+      <checkbox tickedvalue="1" defaultvalue="0" dtype="int">Morning</element>
+      <checkbox tickedvalue="1" defaultvalue="0" dtype="int">Afternoon</element>
+    </horizontal>
+
   </set-data>
   <constraints>
   </constraints>

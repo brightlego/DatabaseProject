@@ -19,7 +19,7 @@ class Backend:
         qtext, param = query.generate_query()
         print(qtext, param)
         try:
-            result = self.__connection.execute(qtext, param)
+            result = query.execute(self.__connection)
         except sqlite3.Error:
             print(qtext, param)
             raise
@@ -30,6 +30,10 @@ class Backend:
 
     def rollback(self):
         self.__connection.rollback()
+
+    def undo(self):
+        query = self.__history.pop()
+        query.undo(self.__connection)
 
     def gen_new_query(self, type_):
         if type_ == "add":

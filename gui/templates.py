@@ -16,6 +16,7 @@ class Page(tk.Frame):
         return self.__getattribute__(name)
 
 
+
 class HollowPage(Page):
     def __getattr__(self, name):
         return self._parent.__getattr__(name)

@@ -1,8 +1,5 @@
 from backend.sqlescape import escape
 
-QUERY_TYPES = ["add", "get", "remove", "change"]
-
-
 class Query:
     def __init__(self, order_by=None, order_asc=True, limit=1):
         self._tables = set()
@@ -63,10 +60,10 @@ class Query:
         return ",".join(out)
 
     def generate_query(self):
-        pass
+        return "", []
 
     def _gen_antiquery(self):
-        self._antiquery = NullQuery()
+        self._antiquery = AntiQuery()
 
     def _finalise_query(self, query):
         query += f" LIMIT {self._limit}"
@@ -74,6 +71,14 @@ class Query:
 
     def get_fields(self):
         return None
+
+    def execute(self, conn):
+        self._antiquery.get_antidata(conn)
+        qtext, param = self.generate_query()
+        return conn.execute(qtext, param)
+
+    def undo(self, conn):
+        self._antiquery.execute(conn)
 
 
 class NullQuery(Query):
@@ -198,21 +203,29 @@ class ChangeQuery(Query):
         self._antiquery = AntiChangeQuery()
 
 
-class AntiAddQuery(RemoveQuery):
+class AntiQuery(Query):
     def _gen_antiquery(self):
         pass
 
+    def _execute(self, conn):
+        pass
 
-class AntiGetQuery(NullQuery):
-    def _gen_antiquery(self):
+    def get_antidata(self, conn):
         pass
 
 
-class AntiRemoveQuery(AddQuery):
-    def _gen_antiquery(self):
+class AntiAddQuery(AntiQuery, RemoveQuery):
+    def get_antidata(self, conn):
         pass
 
 
-class AntiChangeQuery(ChangeQuery):
-    def _gen_antiquery(self):
-        pass
+class AntiGetQuery(AntiQuery, NullQuery):
+    pass
+
+
+class AntiRemoveQuery(AntiQuery, AddQuery):
+    pass
+
+
+class AntiChangeQuery(AntiQuery, ChangeQuery):
+    pass
