@@ -23,8 +23,6 @@ class InputField(gui.templates.Page):
 
         self.__check_empty_widgets()
 
-        print(self.__optionalbox)
-
     def set_template(self, template):
         for item in self.__elements:
             item.destroy()
@@ -105,6 +103,8 @@ class InputField(gui.templates.Page):
             )
         elif item.tag == "custom-select":
             self.__elements.append(CustomSelect(parent, item, row, column, root.tag))
+        elif item.tag == "custom-tail":
+            self.__elements.append(CustomTail(parent, item, row, column, root.tag))
 
     def set_query(self):
         for element in self.__elements:
@@ -360,7 +360,19 @@ class CustomSelect(Input):
 
     def set_query(self):
         query = self._parent.get_query()
-        query.add_custom_select(self._item.text)
+        query.add_custom_select(self._item.attrib["label"], self._item.text)
+
+    def destroy(self):
+        return
+
+
+class CustomTail(Input):
+    def _init_elements(self):
+        return
+
+    def set_query(self):
+        query = self._parent.get_query()
+        query.add_custom_tail(self._item.text)
 
     def destroy(self):
         return

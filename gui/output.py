@@ -16,13 +16,12 @@ class OutputBox(gui.templates.HideablePage):
 
             self.__elements.append(ttk.Separator(self, orient=tk.VERTICAL))
             self.__elements[-1].grid(
-                column=column + len(headers[table]) * 2,
+                column=column + len(headers[table]) * 2 - 1,
                 row=0,
                 rowspan=100,
                 sticky=tk.NS,
             )
             table_lb = tk.Label(self, text=table)
-            print(headers)
             table_lb.grid(column=column, columnspan=len(headers[table]), row=0)
             self.__elements.append(table_lb)
             for field in headers[table]:
@@ -34,6 +33,7 @@ class OutputBox(gui.templates.HideablePage):
                 field_lb.grid(column=column, row=2)
                 self.__elements.append(field_lb)
                 column += 2
+            column += 2
         self.__elements[-2].grid_remove()
 
         self.__elements.append(ttk.Separator(self, orient=tk.HORIZONTAL))

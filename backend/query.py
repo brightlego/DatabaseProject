@@ -11,19 +11,17 @@ class Query:
         self._constraints = {}
         self._custom_constraints = []
         self._custom_select = []
+        self._custom_tail = []
         self._links = {}
         self._order_by = order_by
         self._order_asc = order_asc
         self._limit = limit
-        self._gen_antiquery()
 
     def update_constraint(self, field, table, value):
-        self._antiquery.update_constraint(field, table, value)
         self._constraints[f"{escape(table)}.{escape(field)}"] = value
         self._tables.add(table)
 
     def add_link(self, field1, field2, table1, table2):
-        self._antiquery.add_link(field1, field2, table1, table2)
         self._links[
             f"{escape(table1)}.{escape(field1)}"
         ] = f"{escape(table2)}.{escape(field2)}"
@@ -31,16 +29,15 @@ class Query:
         self._tables.add(table2)
 
     def add_custom_constraint(self, constraint):
-        self._antiquery.add_custom_constraint(constraint)
         self._custom_constraints.append(constraint)
 
     def add_custom_select(self, field, get_text):
         self._custom_select.append((field, get_text))
 
-    def update_data(self, field, table, value=None):
-        self._antiquery.update_data(field, table)
-        self._antiquery.update_constraint(field, table, value)
+    def add_custom_tail(self, tail):
+        self._custom_tail.append(tail)
 
+    def update_data(self, field, table, value=None):
         if value is None:
             if table in self._fields:
                 self._fields[table].append(field)
@@ -74,23 +71,22 @@ class Query:
     def generate_query(self):
         return "", []
 
-    def _gen_antiquery(self):
-        self._antiquery = AntiQuery()
-
     def _finalise_query(self, query):
         query += f" LIMIT {self._limit}"
         return query
+
+    def _gen_tail(self):
+        return " ".join(self._custom_tail)
 
     def get_fields(self):
         return None
 
     def execute(self, conn):
-        self._antiquery.get_antidata(conn)
         qtext, param = self.generate_query()
         return conn.execute(qtext, param)
 
-    def undo(self, conn):
-        self._antiquery.execute(conn)
+    def changed_db(self):
+        return True
 
 
 class NullQuery(Query):
@@ -109,17 +105,14 @@ class NullQuery(Query):
     def update_data(self, field, table, value=None):
         pass
 
-    def _gen_antiquery(self):
-        self._antiquery = self
-
     def generate_query(self):
         return "", []
 
+    def changed_db(self):
+        return False
+
 
 class AddQuery(Query):
-    def _gen_antiquery(self):
-        self._antiquery = AntiAddQuery()
-
     def _gen_data_query(self):
         fields = []
         values = []
@@ -136,7 +129,10 @@ class AddQuery(Query):
         self._tables.add(table)
 
     def generate_query(self):
-        text = f"""INSERT INTO {self._gen_table_query()} {self._gen_data_query()}"""
+        text = f"""INSERT INTO
+            {self._gen_table_query()}
+            {self._gen_data_query()}
+            {self._gen_tail()}"""
         params = []
         for field in self._data:
             params.append(self._data[field])
@@ -147,9 +143,6 @@ class AddQuery(Query):
 class GetQuery(Query):
     def __init__(self, order_by=None, order_asc=True, limit=1000):
         super().__init__(order_by=order_by, order_asc=order_asc, limit=limit)
-
-    def _gen_antiquery(self):
-        self._antiquery = AntiGetQuery()
 
     def get_fields(self):
         fields = copy.deepcopy(self._fields)
@@ -171,7 +164,11 @@ class GetQuery(Query):
         return fields
 
     def generate_query(self):
-        text = f"""SELECT {self._gen_data_query()} FROM {self._gen_table_query()} {self._gen_constraint_query()}"""
+        text = f"""
+            SELECT {self._gen_data_query()}
+            FROM {self._gen_table_query()}
+            {self._gen_constraint_query()}
+            {self._gen_tail()}"""
         params = []
 
         for field in self._constraints:
@@ -189,15 +186,15 @@ class GetQuery(Query):
 
         return text, params
 
+    def changed_db(self):
+        return False
+
 
 class RemoveQuery(Query):
-    def _gen_antiquery(self):
-        self._antiquery = AntiRemoveQuery()
-
     def generate_query(self):
-        text = (
-            f"""DELTE FROM {self._gen_table_query()} {self._gen_constraint_query()}"""
-        )
+        text = f"""
+            DELTE FROM {self._gen_table_query()}
+            {self._gen_constraint_query()} {self._gen_tail()}"""
         params = []
 
         for field in self._constraints:
@@ -220,7 +217,11 @@ class ChangeQuery(Query):
         return out
 
     def generate_query(self):
-        text = f"""UPDATE {self._gen_table_query()} SET {self._gen_data_query()} {self._gen_constraint_query()}"""
+        text = f"""
+            UPDATE {self._gen_table_query()}
+            SET {self._gen_data_query()}
+            {self._gen_constraint_query()}
+            {self._gen_tail()}"""
         params = []
 
         for field in self._data:
@@ -232,34 +233,3 @@ class ChangeQuery(Query):
         text = self._finalise_query(text)
 
         return text, params
-
-    def _gen_antiquery(self):
-        self._antiquery = AntiChangeQuery()
-
-
-class AntiQuery(Query):
-    def _gen_antiquery(self):
-        self._antiquery = NullQuery()
-
-    def _execute(self, conn):
-        pass
-
-    def get_antidata(self, conn):
-        pass
-
-
-class AntiAddQuery(AntiQuery, RemoveQuery):
-    def get_antidata(self, conn):
-        pass
-
-
-class AntiGetQuery(AntiQuery, NullQuery):
-    pass
-
-
-class AntiRemoveQuery(AntiQuery, AddQuery):
-    pass
-
-
-class AntiChangeQuery(AntiQuery, ChangeQuery):
-    pass

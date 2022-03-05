@@ -1,0 +1,42 @@
+<input-box title="Get Cost to Caregiver Per Child" type="get">
+  <search-data>
+    <optional>
+      <entry label="Name" table="Caregivers" field="Name"/>
+      <entry label="Address" table="Caregivers" field="PhysicalAddress"/>
+      <email label="Email" table="Caregivers" field="EmailAddress"/>
+      <phone label="Phone Number" table="Caregivers" field="ContactNumber"/>
+      <number label="Caregiver ID" table="Caregivers" field="CaregiverID"/>
+    </optional>
+  </search-data>
+
+
+  <set-data>
+  </set-data>
+
+
+  <constraints>
+    <get-data table="Children" field="ChildName"/>
+    <get-data table="Children" field="ChildID"/>
+    <custom-select label="Cost to caregiver">
+      SUM(
+        CASE
+          WHEN ChildSessions.MorningSession=1 AND ChildSessions.AfternoonSession=1 THEN
+            80
+          ELSE
+            35
+        END
+      )
+    </custom-select>
+    <custom-tail>
+      GROUP BY Children.ChildID
+    </custom-tail>
+    <link>
+      <table-field table="Children" field="ChildID"/>
+      <table-field table="ChildSessions" field="ChildID"/>
+    </link>
+    <link>
+      <table-field table="Children" field="CaregiverID"/>
+      <table-field table="Caregivers" field="CaregiverID"/>
+    </link>
+  </constraints>
+</input-box>
