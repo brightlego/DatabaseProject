@@ -1,6 +1,9 @@
 """Various templates to be used in the tkinter"""
 
 import tkinter as tk
+import tkinter.font as tkfont
+
+font = "TkFixedFont"
 
 
 class Page(tk.Frame):
@@ -26,7 +29,7 @@ class Page(tk.Frame):
                 -- Initilises the tkinter elements of the page
     """
 
-    def __init__(self, parent, *args, super_kwargs=None, **kwargs):
+    def __init__(self, parent, *args, super_kwargs=None, font=font, **kwargs):
         """The constructor for Page
 
         *args and **kwargs are passed to _init_elements
@@ -38,6 +41,8 @@ class Page(tk.Frame):
         Keyword Arguments:
             super_kwargs (dict)
                 -- The keyword arguments to use in super().__init__
+            font (str)
+                -- The name of the font of the Page
 
         Returns:
             None
@@ -48,6 +53,7 @@ class Page(tk.Frame):
         if super_kwargs is None:
             super_kwargs = {}
         super().__init__(parent, **super_kwargs)
+        self.option_add("*Font", tkfont.nametofont(font))
 
         # Initilise the tkinter elements
         self._init_elements(*args, **kwargs)
@@ -112,7 +118,7 @@ class Button(tk.Button):
                 -- The command when the button is pressed
     """
 
-    def __init__(self, parent, *args, super_kwargs=None, **kwargs):
+    def __init__(self, parent, *args, super_kwargs=None, font=font, **kwargs):
         """The constructor for Button
 
         *args and **kwargs are passed to _init_elements
@@ -124,6 +130,8 @@ class Button(tk.Button):
         Keyword Arguments:
             super_kwargs (dict)
                 -- The keyword arguments to use in super().__init__
+            font (str)
+                -- The name of the font of the button
 
         Returns:
             None
@@ -137,7 +145,11 @@ class Button(tk.Button):
         # Set the text to what is returned by _get_text
         # and the command to _command
         super().__init__(
-            parent, text=self._get_text(), command=self._command, **super_kwargs,
+            parent,
+            text=self._get_text(),
+            command=self._command,
+            font=tkfont.nametofont(font),
+            **super_kwargs,
         )
 
         # Initilise the tkinter elements

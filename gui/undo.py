@@ -1,6 +1,7 @@
 """This file contains the class used in the undo button"""
 
 import gui.templates
+import tkinter as tk
 
 
 class UndoButton(gui.templates.Button):
@@ -18,10 +19,15 @@ class UndoButton(gui.templates.Button):
 
     def _get_text(self):
         """Gets the text for the button"""
-        return "Undo"
+        return "Undo the Previous Change"
 
     def _command(self):
         """Runs the command when the button is pressed"""
 
-        # Undoes the previous change.
-        self._parent.undo()
+        answer = tk.messagebox.askyesno(
+            "Undoing previous change",
+            "Are you sure you want to undo the previous change to the database?",
+        )
+        if answer == tk.messagebox.YES:
+            # Undoes the previous change.
+            self._parent.undo()

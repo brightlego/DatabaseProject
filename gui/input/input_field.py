@@ -14,6 +14,7 @@ class InputField(gui.templates.Page):
         self.__title = tk.Label(self)
         self.__query = None
         self.__submit_button = SubmitButton(self)
+        self.__template = None
 
         self.__title.grid(column=0, row=0)
         self.__searchdata.grid(column=0, columnspan=3, row=1, pady=5)
@@ -24,6 +25,7 @@ class InputField(gui.templates.Page):
         self.__check_empty_widgets()
 
     def set_template(self, template):
+        self.__template = template
         for item in self.__elements:
             item.destroy()
         self.__elements = []
@@ -107,18 +109,19 @@ class InputField(gui.templates.Page):
             self.__elements.append(CustomTail(parent, item, row, column, root.tag))
 
     def set_query(self):
+        errors = []
         for element in self.__elements:
-            error = element.set_query()
-            if error is ValueError:
-                return ValueError
-        return None
+            new_error = element.set_query()
+            if new_error is not None:
+                errors.append(new_error)
+        return errors
 
     def submit_query(self):
         error = self.set_query()
-        if error is ValueError:
+        if len(error) > 0:
             return
         self._parent.submit_query(self.__query)
-        self.__query = type(self.__query)()
+        self.set_template(self.__template)
 
 
 class SearchData(gui.templates.HollowPage, gui.templates.HideablePage):
@@ -170,15 +173,21 @@ class Input:
         return self._entryvar.get()
 
     def set_query(self):
+        err = None
         if not self._validate():
             self._label.config(fg="#c00")
-            return ValueError
+            err = ValueError()
         else:
             self._label.config(fg="#000")
         query = self._parent.get_query()
         if self.get() is None:
             return
         if self._type == "search-data":
+            if self.get() == "":
+                self._label.config(fg="#c00")
+                err = ValueError()
+            else:
+                self._label.config(fg="#000")
             query.update_constraint(
                 self._item.attrib["field"], self._item.attrib["table"], self.get(),
             )
@@ -190,10 +199,15 @@ class Input:
                     self._item.attrib["field"], self._item.attrib["table"], self.get(),
                 )
         else:
+            if self.get() == "":
+                self._label.config(fg="#c00")
+                err = ValueError()
+            else:
+                self._label.config(fg="#000")
             query.update_data(
                 self._item.attrib["field"], self._item.attrib["table"], self.get(),
             )
-        return None
+        return err
 
     def _validate(self):
         return True
