@@ -3,6 +3,8 @@ DROP TABLE IF EXISTS Children;
 DROP TABLE IF EXISTS Sessions;
 DROP TABLE IF EXISTS ChildSessions;
 
+--PRAGMA foreign_keys = ON;
+
 CREATE TABLE Caregivers
 (
     CaregiverID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,7 +37,8 @@ CREATE TABLE ChildSessions
     AfternoonBooked BOOLEAN DEFAULT FALSE,
 
     ChildID INTEGER NOT NULL,
-    Date CHAR(10) NOT NULL, --yyyy-mm-dd
+     --yyyy-mm-dd
+    Date CHAR(10) NOT NULL,
 
     FOREIGN KEY (ChildID) REFERENCES Children(ChildID),
     FOREIGN KEY (Date) REFERENCES Sessions(Date),

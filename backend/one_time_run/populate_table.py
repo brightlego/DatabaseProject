@@ -205,7 +205,7 @@ def link_child_session(connection):
 def main():
     connection = sqlite3.connect(DB_NAME)
 
-    #connection.execute("PRAGMA foreign_keys = ON")
+    # connection.execute("PRAGMA foreign_keys = ON")
 
     populate_caregivers(connection)
     populate_children(connection)

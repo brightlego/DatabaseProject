@@ -23,7 +23,7 @@ class UndoButton(gui.templates.Button):
 
     def _command(self):
         """Runs the command when the button is pressed"""
-
+        # Confermation box
         answer = tk.messagebox.askyesno(
             "Undoing previous change",
             "Are you sure you want to undo the previous change to the database?",

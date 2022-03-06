@@ -72,7 +72,6 @@ class Query:
         return "", []
 
     def _finalise_query(self, query):
-        query += f" LIMIT {self._limit}"
         return query
 
     def _gen_tail(self):

@@ -20,7 +20,7 @@ class Page(tk.Frame):
                 -- The parent to this window
 
     Methods:
-        Overriden:
+        Overridden:
             __init__(parent: gui.page.Page, *args, super_kwargs: dict, **kwargs) -> None
             __getattr__(name: str) -> Any
 
@@ -105,7 +105,7 @@ class Button(tk.Button):
                 -- The parent to this window
 
     Methods:
-        Overriden:
+        Overridden:
             __init__(parent: gui.page.Page, *args, super_kwargs: dict, **kwargs) -> None
             __getattr__(name: str) -> Any
 
