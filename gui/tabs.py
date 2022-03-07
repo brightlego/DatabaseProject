@@ -1,3 +1,5 @@
+"""Stores the objects for the tabs themselves"""
+
 import math
 import tkinter as tk
 
@@ -204,7 +206,7 @@ class TabButton(tk.Radiobutton):
 
         # Get the variable used in the button from the parent
         # This is so only one button can be depressed at a time
-        self.__variable = self.get_variable()
+        self.__variable = self.__parent.get_variable()
         super().__init__(
             parent,
             *args,
@@ -464,7 +466,7 @@ class AddTab(Tab):
             template (xml.etree.ElementTree)
                 -- The template cache
         """
-        
+
         # Returns the relevent XML cache
         xml_cache = self._parent.get_xml_cache()
         return xml_cache.add_cache[title]
