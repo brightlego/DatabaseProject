@@ -1,0 +1,18 @@
+<input-box title="Remove Child" type="remove">
+  <search-data>
+    <label label="Note: Remember to remove attendances to child sessions of this child's ID"/>
+    <entry label="Child Name" table="Children" field="ChildName"/>
+    <number label="Child ID" table="Children" field="Child ID"/>
+
+    <optional>
+    </optional>
+  </search-data>
+
+
+  <set-data>
+  </set-data>
+
+
+  <constraints>
+  </constraints>
+</input-box>

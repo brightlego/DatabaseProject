@@ -114,9 +114,14 @@ class InputField(gui.templates.Page):
         root = template.getroot()
         self.__title["text"] = root.attrib["title"]
 
+        if "limit" in root.attrib:
+            limit = int(root.attrib["limit"])
+        else:
+            limit = None
+
         # Delete the old query and generate a new one
         del self.__query
-        self.__query = self._parent.gen_new_query(root.attrib["type"])
+        self.__query = self._parent.gen_new_query(root.attrib["type"], limit)
 
         # Iterate through the items in the root
         for item in root:
@@ -261,6 +266,8 @@ class InputField(gui.templates.Page):
             self.__elements.append(Checkbox(parent, item, row, column, tag))
         elif item.tag == "number":
             self.__elements.append(Number(parent, item, row, column, tag))
+        elif item.tag == "label":
+            self.__elements.append(Label(parent, item, row, column, tag))
         elif item.tag == "custom-constraint":
             self.__elements.append(CustomConstraint(parent, item, row, column, tag))
         elif item.tag == "custom-select":

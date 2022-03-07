@@ -1,0 +1,20 @@
+<input-box title="Change Child Name" type="change">
+  <search-data>
+
+    <optional>
+      <entry label="Old Child Name" table="Children" field="ChildName"/>
+      <number label="Child ID" table="Children" field="ChildID"/>
+      <number label="Caregiver ID" table="Children" field="CaregiverID"/>
+
+    </optional>
+  </search-data>
+
+
+  <set-data>
+    <entry label="New Child Name" table="Children" field="ChildName"/>
+  </set-data>
+
+
+  <constraints>
+  </constraints>
+</input-box>

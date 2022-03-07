@@ -1,0 +1,17 @@
+<input-box title="Add New Child" type="add">
+  <search-data>
+    <entry label="Child Name" table="Children" field="ChildName"/>
+    <number label="CaregiverID" table="Children" field="CaregiverID"/>
+
+    <optional>
+    </optional>
+  </search-data>
+
+
+  <set-data>
+  </set-data>
+
+
+  <constraints>
+  </constraints>
+</input-box>

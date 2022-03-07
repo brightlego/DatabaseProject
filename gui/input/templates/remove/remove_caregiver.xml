@@ -1,0 +1,20 @@
+<input-box title="Remove Caregiver" type="remove">
+  <search-data>
+    <label label="Note: Remember to remove all children of this caregiver"/>
+    <number label="Caregiver ID" table="Caregivers" field="Caregiver ID"/>
+    <entry label="Name" table="Caregivers" field="Name"/>
+    <optional>
+      <entry label="Address" table="Caregivers" field="PhysicalAddress"/>
+      <email label="Email" table="Caregivers" field="EmailAddress"/>
+      <phone label="Phone Number" table="Caregivers" field="ContactNumber"/>
+    </optional>
+  </search-data>
+
+
+  <set-data>
+  </set-data>
+
+
+  <constraints>
+  </constraints>
+</input-box>

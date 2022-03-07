@@ -1,0 +1,22 @@
+<input-box title="Change Booking at Session" type="change">
+  <search-data>
+    <optional>
+      <entry label="ChildID" table="ChildSessions" field="ChildID"/>
+      <date label="Session Date" table="ChildSessions" field="Date"/>
+      <horizontal label="Session Type">
+        <checkbox tickedvalue="1" defaultvalue="0" dtype="int" label="Morning" table="ChildSessions" field="MorningSession"/>
+        <checkbox tickedvalue="1" defaultvalue="0" dtype="int" label="Afternoon" table="ChildSessions" field="AfternoonSession"/>
+      </horizontal>
+    </optional>
+  </search-data>
+
+  <set-data>
+    <horizontal label="Booked sessions">
+      <checkbox tickedvalue="1" defaultvalue="0" dtype="int" label="Morning" table="ChildSessions" field="MorningBooked"/>
+      <checkbox tickedvalue="1" defaultvalue="0" dtype="int" label="Afternoon" table="ChildSessions" field="AfternoonBooked"/>
+    </horizontal>
+
+  </set-data>
+  <constraints>
+  </constraints>
+</input-box>

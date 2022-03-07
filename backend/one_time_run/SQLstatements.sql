@@ -19,7 +19,7 @@ CREATE TABLE Children
     ChildID INTEGER PRIMARY KEY AUTOINCREMENT,
     ChildName TEXT NOT NULL,
     CaregiverID INTEGER NOT NULL,
-    FOREIGN KEY (CaregiverID) REFERENCES Caregivers(CaregiverID)
+    FOREIGN KEY (CaregiverID) REFERENCES Caregivers(CaregiverID) ON DELETE CASCADE
 );
 
 CREATE TABLE Sessions
@@ -40,7 +40,7 @@ CREATE TABLE ChildSessions
      --yyyy-mm-dd
     Date CHAR(10) NOT NULL,
 
-    FOREIGN KEY (ChildID) REFERENCES Children(ChildID),
-    FOREIGN KEY (Date) REFERENCES Sessions(Date),
+    FOREIGN KEY (ChildID) REFERENCES Children(ChildID) ON DELETE CASCADE,
+    FOREIGN KEY (Date) REFERENCES Sessions(Date) ON DELETE CASCADE,
     PRIMARY KEY (Date, ChildID)
 );

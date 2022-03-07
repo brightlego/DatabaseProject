@@ -10,7 +10,7 @@ class UndoButton(gui.templates.Button):
     Inherits from gui.templates.Button
 
     Methods:
-        Overriden:
+        Overridden:
             _get_text() -> str
                 -- Gets the text for the button
             _command() -> None

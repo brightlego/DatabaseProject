@@ -8,6 +8,7 @@ It should not be imported directly. It should be accessed externally only with
 import tkinter as tk
 import tkinter.messagebox as tkmessagebox
 from tkinter import ttk
+import sqlite3
 
 # Import all the widgets in from the different files in the gui
 import gui.templates
@@ -72,6 +73,8 @@ class Gui(gui.templates.Page):
                 -- Commits the changes to the database
             rollback() -> None
                 -- Rolls back the changes to the database to the last commit
+            close() -> None
+                -- Closes the database
             undo() -> None
                 -- Undoes the previous change to the database
             mainloop() -> None
@@ -196,19 +199,21 @@ class Gui(gui.templates.Page):
         # Set the input field to the template
         self.__input.set_template(template)
 
-    def gen_new_query(self, type_):
+    def gen_new_query(self, type_, limit):
         """Get a new query of type `type_`
 
         Arguments:
             type_ (str)
                 -- The type of query
+            limit (int)
+                -- The limit of the query
 
         Returns:
             query (backend.query.Query)
                 -- The empty query
         """
         # Get the query from the backend
-        return self.__backend.gen_new_query(type_)
+        return self.__backend.gen_new_query(type_, limit)
 
     def submit_query(self, query):
         """Submits a query to the backend and handles the output
@@ -221,7 +226,14 @@ class Gui(gui.templates.Page):
             None
         """
         fields = query.get_fields()
-        data = self.__backend.handle_query(query)
+        try:
+            data = self.__backend.handle_query(query)
+
+        # Check if a UNIQUE constraint has failed and give an appropriate error
+        except sqlite3.IntegrityError as err:
+            self.__output.reset()
+            if err.args[0].startswith("UNIQUE constraint failed"):
+                self.__output.set_headers({"ERROR: Already Exists": [""]})
         if fields:
             self.__output.reset()
             self.__output.set_headers(fields)
@@ -263,6 +275,10 @@ class Gui(gui.templates.Page):
     def mainloop(self, *args, **kwargs):
         """Runs the mainloop of the root."""
         self.__root.mainloop(*args, **kwargs)
+
+    def close(self):
+        """Close the database"""
+        self.__backend.close()
 
 
 class GuiRoot(tk.Tk):
@@ -323,10 +339,12 @@ class GuiRoot(tk.Tk):
         # destroy self
         elif answer:
             self.__gui.commit()
-            super().destroy()
 
         # If the user answers no, rollback changes to the database and
         # destroy self
         else:
             self.__gui.rollback()
-            super().destroy()
+
+        # Close the database
+        self.__gui.close()
+        super().destroy()

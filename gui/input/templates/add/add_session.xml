@@ -1,0 +1,20 @@
+<input-box title="Add Session" type="add">
+  <search-data>
+
+    <optional>
+    </optional>
+  </search-data>
+
+
+  <set-data>
+    <date label="Session Date" table="Sessions" field="Date"/>
+    <radio label="Sesion Type" table="Sessions" field="SessionType" dtype="str">
+      <element value="M">Morning</element>
+      <element value="A">Afternoon</element>
+    </radio>
+  </set-data>
+
+
+  <constraints>
+  </constraints>
+</input-box>

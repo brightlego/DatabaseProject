@@ -1,0 +1,18 @@
+<input-box title="Remove Child Attendance at Session for the Day" type="remove">
+  <search-data>
+    <entry label="Child ID" table="ChildSessions" field="ChildID"/>
+    <date label="Session Date" table="ChildSessions" field="Date"/>
+    
+
+    <optional>
+    </optional>
+  </search-data>
+
+
+  <set-data>
+  </set-data>
+
+
+  <constraints>
+  </constraints>
+</input-box>

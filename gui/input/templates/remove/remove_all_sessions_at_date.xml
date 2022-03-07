@@ -1,0 +1,20 @@
+<input-box title="Remove All Child Attendances at a Session" type="remove" limit="1000">
+  <search-data>
+    <date label="Session Date" table="ChildSessions" field="Date"/>
+    <radio label="Sesion Type" table="Sessions" field="SessionType" dtype="str">
+      <element value="M">Morning</element>
+      <element value="A">Afternoon</element>
+    </radio>
+
+    <optional>
+    </optional>
+  </search-data>
+
+
+  <set-data>
+  </set-data>
+
+
+  <constraints>
+  </constraints>
+</input-box>

@@ -1,13 +1,13 @@
-<input-box title="Change Caregiver Phone Number" type="change">
+<input-box title="Change Caregiver Email" type="change">
   <search-data>
     <optional>
       <entry label="Name" table="Caregivers" field="Name"/>
       <entry label="Address" table="Caregivers" field="PhysicalAddress"/>
-      <email label="Email" table="Caregivers" field="EmailAddress"/>
+      <phone label="Phone Number" table="Caregivers" field="ContactNumber"/>
       <number label="Caregiver ID" table="Caregivers" field="CaregiverID"/>
     </optional>
   </search-data>
   <set-data>
-    <phone label="New Phone Number" table="Caregivers" field="ContactNumber"/>
+    <email label="New Email" table="Caregivers" field="EmailAddress"/>
   </set-data>
 </input-box>

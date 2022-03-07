@@ -1,0 +1,17 @@
+<input-box title="Remove Child Attendances" type="remove" limit="10000">
+  <search-data>
+    <entry label="Child ID" table="ChildSessions" field="ChildID"/>
+
+
+    <optional>
+    </optional>
+  </search-data>
+
+
+  <set-data>
+  </set-data>
+
+
+  <constraints>
+  </constraints>
+</input-box>
